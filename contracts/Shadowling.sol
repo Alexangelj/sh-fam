@@ -86,7 +86,7 @@ contract Shadowling is
         ids[1] = itemId(props.flaw, Components.flawComponents, Attributes.FLAW);
         ids[2] = itemId(
             props.origin,
-            Components.birthplaceComponents,
+            Components.originComponents,
             Attributes.ORIGIN
         );
         ids[3] = itemId(
@@ -128,11 +128,7 @@ contract Shadowling is
             Attributes.CREATURE
         );
         burnItem(next.flaw, Components.flawComponents, Attributes.FLAW);
-        burnItem(
-            next.origin,
-            Components.birthplaceComponents,
-            Attributes.ORIGIN
-        );
+        burnItem(next.origin, Components.originComponents, Attributes.ORIGIN);
         burnItem(
             next.bloodline,
             Components.bloodlineComponents,

@@ -29,9 +29,9 @@ library Components {
         "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
     uint256 internal constant flawsLength = 186;
 
-    string internal constant birthplaces =
+    string internal constant origins =
         "von,de la,chadde,mise,of,da,from,in,first of,sixth of,t11s,hi tuba,vibes,mons,zef,state,sump,sunarto,jai,mewny,amogsus,light,groovy,formerly";
-    uint256 internal constant birthplacesLength = 24;
+    uint256 internal constant originsLength = 24;
 
     string internal constant bloodlines =
         "Nakamoto,Buterin,Zamfir,Mintz,Ashbluff,Marblemaw,Bozzelli,Fellowes,Windward,Yarrow,Yearwood,Wixx,Humblecut,Dustfinger,Biddercombe,Kicklighter,Vespertine,October,Gannon,Collymore,Stoll,Adler,Huxley,Ledger,Hayes,Ford,Finnegan,Beckett,Zimmerman,Crassus,Hendrix,Lennon,Thatcher,St. James,Cromwell,Monroe,West,Langley,Cassidy,Lopez,Jenkins,Udobata,Valova,Gresham,Frederiksen,Vasiliev,Mancini,Danicek,Okwuoma,Chibugo,Broberg,Strozak,Borkowska,Araujo,Geisler,Hidalgo,Ibekwe,Schmidt,Leehy,Rodrigue,Hines,Izmaylov,Egede,Pinette,Hakugi,McLellan,Mailhot,Lelkova,Simon,Tjangamarra,Sandgreen,Nystrom,Kjeldsen,Goncalves,Sos,Hornblower,Pelletier,Donaldson,Jackson,Rojo,Ermakov,Stornik,Lothran,Gousse,Henrichon,Onwuka,Horak,Elizondo,Mikulanc,Skotnik,Berg,Nilsson,Berg,Enyinnaya,Hermanns,Holmberg,Oliveira,Kufersin,Kwiatkowski,Courtois,Piest,Sandheaver,Woods,Ives,Dias,Grizelj,Viragh,Blau,Kodou,Torma,Sorokina,Took-Took,Allen,Melo,Bunker,Kiyomizu,Donkervoort,Maciejewska,Steffensen,Solomina,Zidek,Gotou,Bryant,Quenneville,Karlsen,Thomsen,Havlikova,Feron,Bazhenov,Amsel,Enoksen,Schneider,Kiss,Woodd,Benes,Probst,Aliyeva,Fleischer,Plain,Hoskinson,Chad,Maki,Gandhi,Zhao,Wintermute,Cronje,Felten,Yellen,Wood,Zhu,Davis,K,Delphine,Thorne,Kulechov,Nigiri,Goldfeder,Ranth,Galt,Lincoln,Trump";
@@ -65,13 +65,12 @@ library Components {
         return pluck(tokenId, "FLAW", flaws, flawsLength, true);
     }
 
-    function birthplaceComponents(uint256 tokenId)
+    function originComponents(uint256 tokenId)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return
-            pluck(tokenId, "BIRTHPLACE", birthplaces, birthplacesLength, true);
+        return pluck(tokenId, "ORIGIN", origins, originsLength, true);
     }
 
     function bloodlineComponents(uint256 tokenId)

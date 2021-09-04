@@ -225,7 +225,7 @@ library Attributes {
         } else if (itemType == FLAW) {
             arr = Components.flaws;
         } else if (itemType == ORIGIN) {
-            arr = Components.birthplaces;
+            arr = Components.origins;
         } else if (itemType == BLOODLINE) {
             arr = Components.bloodlines;
         } else if (itemType == EYES) {
@@ -306,8 +306,8 @@ library Attributes {
         return TokenId.toId(tokenId.flawComponents(), FLAW);
     }
 
-    function birthplaceId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.birthplaceComponents(), ORIGIN);
+    function originId(uint256 tokenId) internal pure returns (uint256) {
+        return TokenId.toId(tokenId.originComponents(), ORIGIN);
     }
 
     function bloodlineId(uint256 tokenId) internal pure returns (uint256) {
@@ -328,7 +328,7 @@ library Attributes {
             ItemIds({
                 creature: creatureId(tokenId),
                 flaw: flawId(tokenId),
-                origin: birthplaceId(tokenId),
+                origin: originId(tokenId),
                 bloodline: bloodlineId(tokenId),
                 eyes: eyesId(tokenId),
                 name: nameId(tokenId)
