@@ -6,7 +6,7 @@ import "../TokenId.sol";
 import { Base64, toString } from "../MetadataUtils.sol";
 
 /// @title Helper contract for generating ERC-1155 token ids and descriptions for
-/// the individual items inside a Loot bag.
+/// the individual items inside a Shadowling.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
 contract Attributes is Components {
@@ -34,7 +34,7 @@ contract Attributes is Components {
         uint256 eyes;
         uint256 name;
     }
-    struct ItemNames {
+    struct ItemProperties {
         string creature;
         string flaw;
         string origin;
@@ -49,34 +49,34 @@ contract Attributes is Components {
         view
         returns (string memory)
     {
-        ItemNames memory names = itemNames(tokenId);
+        ItemProperties memory props = itemProperties(tokenId);
 
         string[13] memory parts;
         parts[
             0
         ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
 
-        parts[1] = names.creature;
+        parts[1] = props.creature;
 
         parts[2] = '</text><text x="10" y="40" class="base">';
 
-        parts[3] = names.flaw;
+        parts[3] = props.flaw;
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
-        parts[5] = names.origin;
+        parts[5] = props.origin;
 
         parts[6] = '</text><text x="10" y="80" class="base">';
 
-        parts[7] = names.bloodline;
+        parts[7] = props.bloodline;
 
         parts[8] = '</text><text x="10" y="120" class="base">';
 
-        parts[9] = names.eyes;
+        parts[9] = props.eyes;
 
         parts[10] = '</text><text x="10" y="140" class="base">';
 
-        parts[11] = names.name;
+        parts[11] = props.name;
 
         parts[12] = '</text><text x="10" y="160" class="base">';
 
@@ -118,9 +118,38 @@ contract Attributes is Components {
         returns (string memory)
     {
         ItemIds memory attr = ids(tokenId);
-        string memory output = string(
-            abi.encodePacked('"attributes": ', attributes(attr.creature), "}")
+        ItemProperties memory items = itemProperties(tokenId);
+
+        string memory output;
+
+        // should we also use components[0] which contains the item name?
+        string memory res = string(
+            abi.encodePacked("[", trait(itemTypes[0], items.creature))
         );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait(itemTypes[1], items.flaw))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait(itemTypes[2], items.origin))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait(itemTypes[3], items.bloodline))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait(itemTypes[4], items.eyes))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait(itemTypes[5], items.name))
+        );
+
+        res = string(abi.encodePacked(res, "]"));
+
+        output = string(abi.encodePacked('"attributes": ', res, "}"));
         return output;
     }
 
@@ -132,7 +161,7 @@ contract Attributes is Components {
         string memory slot = itemTypes[itemType];
         string memory res = string(abi.encodePacked("[", trait("Slot", slot)));
 
-        string memory item = itemName(itemType, components[0]);
+        string memory item = baseItem(itemType, components[0]);
         res = string(abi.encodePacked(res, ", ", trait("Item", item)));
 
         if (components[1] > 0) {
@@ -188,15 +217,15 @@ contract Attributes is Components {
 
     // @notice Given an ERC1155 token id, it returns its name by decoding and parsing
     // the id
-    function tokenName(uint256 id) public view returns (string memory) {
+    function tokenProperty(uint256 id) public view returns (string memory) {
         (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         return componentsToString(components, itemType);
     }
 
     // Returns the "vanilla" item name w/o any prefix/suffixes or augmentations
-    function itemName(uint256 itemType, uint256 idx)
+    function baseItem(uint256 itemType, uint256 idx)
         public
-        view
+        pure
         returns (string memory)
     {
         string memory arr;
@@ -227,7 +256,7 @@ contract Attributes is Components {
     {
         // item type: what slot to get
         // components[0] the index in the array
-        string memory item = itemName(itemType, components[0]);
+        string memory item = baseItem(itemType, components[0]);
 
         // We need to do -1 because the 'no description' is not part of loot copmonents
 
@@ -319,27 +348,33 @@ contract Attributes is Components {
     }
 
     // Given an ERC721 bag, returns the names of the items in the bag
-    function itemNames(uint256 tokenId) public view returns (ItemNames memory) {
+    function itemProperties(uint256 tokenId)
+        public
+        view
+        returns (ItemProperties memory)
+    {
         ItemIds memory items = ids(tokenId);
         return
-            ItemNames({
-                creature: tokenName(items.creature),
-                flaw: tokenName(items.flaw),
-                origin: tokenName(items.origin),
-                bloodline: tokenName(items.bloodline),
-                eyes: tokenName(items.eyes),
-                name: tokenName(items.name)
+            ItemProperties({
+                creature: tokenProperty(items.creature),
+                flaw: tokenProperty(items.flaw),
+                origin: tokenProperty(items.origin),
+                bloodline: tokenProperty(items.bloodline),
+                eyes: tokenProperty(items.eyes),
+                name: tokenProperty(items.name)
             });
     }
 
     function namesMany(uint256[] memory tokenNames)
         public
         view
-        returns (ItemNames[] memory)
+        returns (ItemProperties[] memory)
     {
-        ItemNames[] memory allNames = new ItemNames[](tokenNames.length);
+        ItemProperties[] memory allNames = new ItemProperties[](
+            tokenNames.length
+        );
         for (uint256 i = 0; i < tokenNames.length; i++) {
-            allNames[i] = itemNames(tokenNames[i]);
+            allNames[i] = itemProperties(tokenNames[i]);
         }
 
         return allNames;
