@@ -11,7 +11,7 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
 
     /// @notice Mints Shadowlings to `msg.sender`
     function claim(uint256 tokenId) external nonReentrant {
-        require(tokenId > 8000 && tokenId < 8021, "Token ID invalid");
+        require(tokenId > 0 && tokenId < 8021, "Token ID invalid");
         _mint(_msgSender(), tokenId, 1, new bytes(0));
     }
 
@@ -89,7 +89,7 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         uint256 itemType,
         string memory keyPrefix
     ) private view returns (uint256) {
-        uint256[5] memory components = statComponent(tokenId, keyPrefix);
+        uint256[5] memory components;
         return TokenId.toId(components, itemType);
     }
 
@@ -111,7 +111,7 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         uint256 itemType,
         string memory keyPrefix
     ) private {
-        uint256[5] memory components = statComponent(tokenId, keyPrefix);
+        uint256[5] memory components; //statComponent(tokenId, keyPrefix);
         uint256 id = TokenId.toId(components, itemType);
         _burn(msg.sender, id, 1);
     }

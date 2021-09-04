@@ -5,32 +5,6 @@ pragma solidity ^0.8.0;
 import "./strings.sol";
 import "./MetadataUtils.sol";
 
-contract NameChanger {
-    /* IERC20 internal constant agld =
-        IERC20(0x32353A6C91143bfd6C7d363B546e62a9A2489A20);
-    uint256 private constant NAME_CHANGE_BASE_PRICE = 420 * 10**18;
-    mapping(uint256 => string) internal firstNameOverride;
-    mapping(uint256 => string) internal lastNameOverride;
-    mapping(uint256 => uint256) internal numNameChanges;
-
-    function changeName(
-        uint256 tokenId,
-        string calldata firstName,
-        string calldata lastName
-    ) external nonReentrant {
-        require(tokenId > 0 && tokenId < 8021, "Token ID invalid");
-        require(ownerOf(tokenId) == msg.sender, "Not Name owner");
-
-        // transfer AGLD to owner
-        agld.transferFrom(msg.sender, owner(), nameChangePrice(tokenId));
-
-        // override name
-        firstNameOverride[tokenId] = firstName;
-        lastNameOverride[tokenId] = lastName;
-        numNameChanges[tokenId] += 1;
-    } */
-}
-
 contract Components {
     using strings for string;
     using strings for strings.slice;
@@ -185,6 +159,10 @@ contract Components {
         return uint256(keccak256(abi.encodePacked(input)));
     }
 
+    function roll(string memory input) internal pure returns (uint256) {
+        return (uint256(keccak256(abi.encodePacked(input))) % 6) + 1;
+    }
+
     function creatureComponents(uint256 tokenId)
         internal
         pure
@@ -237,9 +215,41 @@ contract Components {
     function statComponent(uint256 tokenId, string memory keyPrefix)
         internal
         pure
-        returns (uint256[5] memory)
+        returns (uint256)
     {
-        return pluck(tokenId, keyPrefix, stats, statsLength, false);
+        return pluckStat(tokenId, keyPrefix);
+    }
+
+    function pluckStat(uint256 tokenId, string memory keyPrefix)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256 roll1 = roll(
+            string(abi.encodePacked(keyPrefix, toString(tokenId), "1"))
+        );
+        uint256 min = roll1;
+        uint256 roll2 = roll(
+            string(abi.encodePacked(keyPrefix, toString(tokenId), "2"))
+        );
+        min = min > roll2 ? roll2 : min;
+        uint256 roll3 = roll(
+            string(abi.encodePacked(keyPrefix, toString(tokenId), "3"))
+        );
+        min = min > roll3 ? roll3 : min;
+        uint256 roll4 = roll(
+            string(abi.encodePacked(keyPrefix, toString(tokenId), "4"))
+        );
+        min = min > roll4 ? roll4 : min;
+
+        // get 3 highest dice rolls
+        uint256 stat = roll1 + roll2 + roll3 + roll4 - min;
+        return stat;
+        /* string memory output = string(
+            abi.encodePacked(keyPrefix, ": ", toString(stat))
+        );
+
+        return output; */
     }
 
     function pluck(
