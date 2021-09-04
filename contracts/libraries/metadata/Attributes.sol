@@ -65,15 +65,15 @@ library Attributes {
 
         parts[7] = props.bloodline;
 
-        parts[8] = '</text><text x="10" y="120" class="base">';
+        parts[8] = '</text><text x="10" y="100" class="base">';
 
         parts[9] = props.eyes;
 
-        parts[10] = '</text><text x="10" y="140" class="base">';
+        parts[10] = '</text><text x="10" y="120" class="base">';
 
         parts[11] = props.name;
 
-        parts[12] = '</text><text x="10" y="160" class="base">';
+        parts[12] = '</text><text x="10" y="140" class="base">';
 
         string memory output = string(
             abi.encodePacked(

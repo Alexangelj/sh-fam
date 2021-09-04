@@ -36,15 +36,15 @@ library Stats {
         string[11] memory stats;
 
         stats[0] = toString(attr.strength);
-        stats[1] = '</text><text x="10" y="180" class="base">';
+        stats[1] = '</text><text x="10" y="160" class="base">';
         stats[2] = toString(attr.dexterity);
-        stats[3] = '</text><text x="10" y="200" class="base">';
+        stats[3] = '</text><text x="10" y="180" class="base">';
         stats[4] = toString(attr.constitution);
-        stats[5] = '</text><text x="10" y="220" class="base">';
+        stats[5] = '</text><text x="10" y="200" class="base">';
         stats[6] = toString(attr.intelligence);
-        stats[7] = '</text><text x="10" y="240" class="base">';
+        stats[7] = '</text><text x="10" y="220" class="base">';
         stats[8] = toString(attr.wisdom);
-        stats[9] = '</text><text x="10" y="260" class="base">';
+        stats[9] = '</text><text x="10" y="240" class="base">';
         stats[10] = toString(attr.charisma);
 
         string memory output = string(
