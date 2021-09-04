@@ -29,6 +29,7 @@ library Attributes {
         uint256 eyes;
         uint256 name;
     }
+
     struct ItemProperties {
         string creature;
         string flaw;
@@ -39,39 +40,37 @@ library Attributes {
     }
 
     /// @notice Returns an SVG for the provided token id
-    function getImage(uint256 tokenId, string memory last)
+    function getImage(ItemProperties memory item, string memory last)
         internal
-        view
+        pure
         returns (string memory)
     {
-        ItemProperties memory props = itemProperties(tokenId);
-
         string[13] memory parts;
         parts[
             0
         ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
 
-        parts[1] = props.creature;
+        parts[1] = item.creature;
 
         parts[2] = '</text><text x="10" y="40" class="base">';
 
-        parts[3] = props.flaw;
+        parts[3] = item.flaw;
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
-        parts[5] = props.origin;
+        parts[5] = item.origin;
 
         parts[6] = '</text><text x="10" y="80" class="base">';
 
-        parts[7] = props.bloodline;
+        parts[7] = item.bloodline;
 
         parts[8] = '</text><text x="10" y="100" class="base">';
 
-        parts[9] = props.eyes;
+        parts[9] = item.eyes;
 
         parts[10] = '</text><text x="10" y="120" class="base">';
 
-        parts[11] = props.name;
+        parts[11] = item.name;
 
         parts[12] = '</text><text x="10" y="140" class="base">';
 
@@ -108,9 +107,11 @@ library Attributes {
 
     /// @notice Returns the attributes properties of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
-    function attributes(uint256 tokenId) internal view returns (string memory) {
-        ItemProperties memory items = itemProperties(tokenId);
-
+    function attributes(ItemProperties memory items)
+        internal
+        pure
+        returns (string memory)
+    {
         string memory output;
 
         // should we also use components[0] which contains the item name?
@@ -146,7 +147,7 @@ library Attributes {
 
     /// @notice Returns the attributes associated with this item.
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
-    function _attributes(uint256 id) internal view returns (string memory) {
+    function _attributes(uint256 id) internal pure returns (string memory) {
         (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         // should we also use components[0] which contains the item name?
         string memory slot = getItemTypes(itemType);
@@ -208,7 +209,7 @@ library Attributes {
 
     // @notice Given an ERC1155 token id, it returns its name by decoding and parsing
     // the id
-    function tokenProperty(uint256 id) internal view returns (string memory) {
+    function tokenProperty(uint256 id) internal pure returns (string memory) {
         (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         return componentsToString(components, itemType);
     }
@@ -233,7 +234,7 @@ library Attributes {
         } else if (itemType == NAME) {
             arr = Components.names;
         } else {
-            revert("Too shadowy");
+            revert("Unexpected property");
         }
 
         return Components.getItemFromCSV(arr, idx);
@@ -242,7 +243,7 @@ library Attributes {
     // Creates the token description given its components and what type it is
     function componentsToString(uint256[5] memory components, uint256 itemType)
         internal
-        view
+        pure
         returns (string memory)
     {
         // item type: what slot to get
@@ -306,8 +307,12 @@ library Attributes {
         return TokenId.toId(tokenId.flawComponents(), FLAW);
     }
 
-    function originId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.originComponents(), ORIGIN);
+    function originId(uint256 tokenId, bool shadowChain)
+        internal
+        pure
+        returns (uint256)
+    {
+        return TokenId.toId(tokenId.originComponents(shadowChain), ORIGIN);
     }
 
     function bloodlineId(uint256 tokenId) internal pure returns (uint256) {
@@ -322,39 +327,12 @@ library Attributes {
         return TokenId.toId(tokenId.nameComponents(), NAME);
     }
 
-    // Given an erc721 bag, returns the erc1155 token ids of the items in the bag
-    function ids(uint256 tokenId) internal pure returns (ItemIds memory) {
-        return
-            ItemIds({
-                creature: creatureId(tokenId),
-                flaw: flawId(tokenId),
-                origin: originId(tokenId),
-                bloodline: bloodlineId(tokenId),
-                eyes: eyesId(tokenId),
-                name: nameId(tokenId)
-            });
-    }
-
-    function idsMany(uint256[] memory tokenIds)
+    // Given an ERC721 bag, returns the names of the items in the bag
+    function props(ItemIds memory items)
         internal
         pure
-        returns (ItemIds[] memory)
-    {
-        ItemIds[] memory itemids = new ItemIds[](tokenIds.length);
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            itemids[i] = ids(tokenIds[i]);
-        }
-
-        return itemids;
-    }
-
-    // Given an ERC721 bag, returns the names of the items in the bag
-    function itemProperties(uint256 tokenId)
-        internal
-        view
         returns (ItemProperties memory)
     {
-        ItemIds memory items = ids(tokenId);
         return
             ItemProperties({
                 creature: tokenProperty(items.creature),
@@ -364,21 +342,6 @@ library Attributes {
                 eyes: tokenProperty(items.eyes),
                 name: tokenProperty(items.name)
             });
-    }
-
-    function namesMany(uint256[] memory tokenNames)
-        internal
-        view
-        returns (ItemProperties[] memory)
-    {
-        ItemProperties[] memory allNames = new ItemProperties[](
-            tokenNames.length
-        );
-        for (uint256 i = 0; i < tokenNames.length; i++) {
-            allNames[i] = itemProperties(tokenNames[i]);
-        }
-
-        return allNames;
     }
 
     function getItemTypes(uint256 index) internal pure returns (string memory) {

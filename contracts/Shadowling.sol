@@ -16,24 +16,67 @@ contract Shadowling is
 {
     constructor() ERC1155("") {}
 
-    mapping(uint256 => Attributes.ItemIds) public propertiesOf;
     mapping(address => mapping(uint256 => bool)) public deposited;
+    uint256[] public minted;
+
+    function getNumber(uint256 tokenId) public pure returns (uint256) {
+        uint256 number = Components.random(
+            string(
+                abi.encodePacked(
+                    toString(StatComponents.roll(toString((tokenId % 21) + 1))),
+                    toString(
+                        StatComponents.roll(
+                            "0x5a872ddb747a81f27d5fe751c58223eebd72be46cd53d0395ec17bb5952ed665"
+                        )
+                    )
+                )
+            )
+        );
+        return number;
+    }
 
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
     function claim(uint256 tokenId) external nonReentrant {
-        require(tokenId > 0 && tokenId < 8021, "Token ID invalid");
-        string memory number = toString(StatComponents.roll("35434553"));
+        require(tokenId > 0 && tokenId < 10001, "E");
 
-        Attributes.ItemIds memory props = Attributes.ItemIds({
-            creature: Components.random(number),
-            flaw: Components.random(number),
-            origin: Components.random(number),
-            bloodline: Components.random(number),
-            eyes: Components.random(number),
-            name: Components.random(number)
+        Attributes.ItemIds memory state = Attributes.ItemIds({
+            creature: Attributes.creatureId(getNumber(tokenId)),
+            flaw: Attributes.flawId(getNumber(tokenId)),
+            origin: Attributes.originId(getNumber(tokenId), false),
+            bloodline: Attributes.bloodlineId(getNumber(tokenId)),
+            eyes: Attributes.eyesId(getNumber(tokenId)),
+            name: Attributes.nameId(getNumber(tokenId))
         });
-        propertiesOf[tokenId] = props;
+
+        propertiesOf[tokenId] = state;
+        minted.push(tokenId);
         _mint(_msgSender(), tokenId, 1, new bytes(0));
+    }
+
+    /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
+    function summon(uint256 tokenId) external nonReentrant {
+        require(tokenId > 0 && tokenId < 10001, "E");
+
+        Attributes.ItemIds memory state = Attributes.ItemIds({
+            creature: Attributes.creatureId(getNumber(tokenId)),
+            flaw: Attributes.flawId(getNumber(tokenId)),
+            origin: Attributes.originId(getNumber(tokenId), true),
+            bloodline: Attributes.bloodlineId(getNumber(tokenId)),
+            eyes: Attributes.eyesId(getNumber(tokenId)),
+            name: Attributes.nameId(getNumber(tokenId))
+        });
+
+        propertiesOf[tokenId] = state;
+        minted.push(tokenId);
+        _mint(_msgSender(), tokenId, 1, new bytes(0));
+    }
+
+    function modify(uint256 tokenId) external nonReentrant {
+        Attributes.ItemIds storage state = propertiesOf[tokenId];
+        uint256 seed = getNumber(
+            (tokenId * block.timestamp) / block.number + state.origin
+        );
+        state.creature = Attributes.creatureId(seed);
     }
 
     /// @notice Transfers the erc721 bag from your account to the contract and then
@@ -85,17 +128,12 @@ contract Shadowling is
         );
         ids[1] = itemId(props.flaw, Components.flawComponents, Attributes.FLAW);
         ids[2] = itemId(
-            props.origin,
-            Components.originComponents,
-            Attributes.ORIGIN
-        );
-        ids[3] = itemId(
             props.bloodline,
             Components.bloodlineComponents,
             Attributes.BLOODLINE
         );
-        ids[4] = itemId(props.eyes, Components.eyeComponents, Attributes.EYES);
-        ids[5] = itemId(props.name, Components.nameComponents, Attributes.NAME);
+        ids[3] = itemId(props.eyes, Components.eyeComponents, Attributes.EYES);
+        ids[4] = itemId(props.name, Components.nameComponents, Attributes.NAME);
         for (uint256 i = 0; i < ids.length; i++) {
             amounts[i] = 1;
             // +21k per call / unavoidable - requires patching OZ
@@ -128,7 +166,6 @@ contract Shadowling is
             Attributes.CREATURE
         );
         burnItem(next.flaw, Components.flawComponents, Attributes.FLAW);
-        burnItem(next.origin, Components.originComponents, Attributes.ORIGIN);
         burnItem(
             next.bloodline,
             Components.bloodlineComponents,

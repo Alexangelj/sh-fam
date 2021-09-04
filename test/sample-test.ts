@@ -31,16 +31,47 @@ describe("Shadowling", function () {
     console.log(id ? id : "", val)
   }
 
-  it("should claim 1 and print tokenURI", async function () {
-    let i = 1
+  it("should claim tokenId 1, print its props, then change it and re print", async function () {
+    let i = 10
     await sh.claim(i)
-    const uri = await sh.tokenURI(i)
-    const json = parseTokenURI(uri)
-    const image = parseImage(json)
+    let uri = await sh.tokenURI(i)
+    let json = parseTokenURI(uri)
     log(json)
-    log(json.image)
+    await sh.modify(i)
+    uri = await sh.tokenURI(i)
+    json = parseTokenURI(uri)
+    log(json)
+  })
 
-    const imageData = { [i]: json.image }
+  it("should summon a shadowchain entity", async function () {
+    let i = 10
+    await sh.summon(i)
+    let uri = await sh.tokenURI(i)
+    let json = parseTokenURI(uri)
+    log(json)
+    await sh.modify(i)
+    uri = await sh.tokenURI(i)
+    json = parseTokenURI(uri)
+    log(json)
+  })
+
+  it.skip("should claim until 50", async function () {
+    let images = []
+    let imageData: any = {}
+    for (let i = 0; i < 50; i++) {
+      try {
+        await sh.claim(i)
+      } catch (err) {
+        console.log("Error on:", i, err)
+      }
+      const uri = await sh.tokenURI(i)
+      const json = parseTokenURI(uri)
+      const image = parseImage(json)
+      images.push(image)
+      imageData[i] = json.image
+      log(json)
+    }
+
     await fs.promises.writeFile("./data.json", JSON.stringify(imageData))
   })
 })

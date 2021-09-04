@@ -11,6 +11,8 @@ import { Base64, toString } from "../MetadataUtils.sol";
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
 contract ShadowlingMetadata {
+    mapping(uint256 => Attributes.ItemIds) public propertiesOf;
+
     function name() external pure returns (string memory) {
         return "Shadowling";
     }
@@ -33,20 +35,19 @@ contract ShadowlingMetadata {
 
     /// @notice Returns an SVG for the provided token id
     function tokenURI(uint256 tokenId) public view returns (string memory) {
+        Attributes.ItemProperties memory props = properties(tokenId);
+        string memory stats = Stats.getStats(Stats.statsOf(tokenId));
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
                         '{ "name": "',
-                        Attributes.tokenProperty(tokenId),
+                        "Shadowling",
                         '", ',
                         '"description" : ',
                         '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        Attributes.getImage(
-                            tokenId,
-                            Stats.getStats(Stats.statsOf(tokenId))
-                        ),
-                        Attributes.attributes(tokenId)
+                        Attributes.getImage(props, stats),
+                        Attributes.attributes(props)
                     )
                 )
             )
@@ -56,5 +57,19 @@ contract ShadowlingMetadata {
         );
 
         return output;
+    }
+
+    /// @notice Returns the attributes properties of a `tokenId`
+    /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
+    function attributes(uint256 tokenId) public view returns (string memory) {
+        return Attributes.attributes(properties(tokenId));
+    }
+
+    function properties(uint256 tokenId)
+        public
+        view
+        returns (Attributes.ItemProperties memory)
+    {
+        return Attributes.props(propertiesOf[tokenId]);
     }
 }
