@@ -10,7 +10,7 @@ import { Base64, toString } from "../MetadataUtils.sol";
 /// the individual items inside a Loot bag.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
-contract ShadowlingMetadata is Attributes, Stats {
+contract ShadowlingMetadata {
     function name() external pure returns (string memory) {
         return "Shadowling";
     }
@@ -38,12 +38,15 @@ contract ShadowlingMetadata is Attributes, Stats {
                 string(
                     abi.encodePacked(
                         '{ "name": "',
-                        tokenName(tokenId),
+                        Attributes.tokenProperty(tokenId),
                         '", ',
                         '"description" : ',
                         '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        getImage(tokenId, getStats(statsOf(tokenId))),
-                        getAttributes(tokenId)
+                        Attributes.getImage(
+                            tokenId,
+                            Stats.getStats(Stats.statsOf(tokenId))
+                        ),
+                        Attributes.attributes(tokenId)
                     )
                 )
             )

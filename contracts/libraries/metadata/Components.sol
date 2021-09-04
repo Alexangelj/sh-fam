@@ -5,126 +5,20 @@ pragma solidity ^0.8.0;
 import "../strings.sol";
 import "../MetadataUtils.sol";
 
-contract Components {
+library Components {
     using strings for string;
     using strings for strings.slice;
 
-    string[] internal suffixes = [
-        // <no suffix>          // 0
-        "of Power", // 1
-        "of Giants", // 2
-        "of Titans", // 3
-        "of Skill", // 4
-        "of Perfection", // 5
-        "of Brilliance", // 6
-        "of Enlightenment", // 7
-        "of Protection", // 8
-        "of Anger", // 9
-        "of Rage", // 10
-        "of Fury", // 11
-        "of Vitriol", // 12
-        "of the Fox", // 13
-        "of Detection", // 14
-        "of Reflection", // 15
-        "of the Twins" // 16
-    ];
+    string internal constant suffixes =
+        "of Power,of Giants,of Titans,of Skill,of Perfection,of Brilliance,of Enlightenment,of Protection,of Anger,of Rage,of Fury,of Vitriol,of the Fox,of Detection,of Reflection,of the Twins";
     uint256 constant suffixesLength = 16;
 
-    string[] internal namePrefixes = [
-        // <no name>            // 0
-        "Agony", // 1
-        "Apocalypse", // 2
-        "Armageddon", // 3
-        "Beast", // 4
-        "Behemoth", // 5
-        "Blight", // 6
-        "Blood", // 7
-        "Bramble", // 8
-        "Brimstone", // 9
-        "Brood", // 10
-        "Carrion", // 11
-        "Cataclysm", // 12
-        "Chimeric", // 13
-        "Corpse", // 14
-        "Corruption", // 15
-        "Damnation", // 16
-        "Death", // 17
-        "Demon", // 18
-        "Dire", // 19
-        "Dragon", // 20
-        "Dread", // 21
-        "Doom", // 22
-        "Dusk", // 23
-        "Eagle", // 24
-        "Empyrean", // 25
-        "Fate", // 26
-        "Foe", // 27
-        "Gale", // 28
-        "Ghoul", // 29
-        "Gloom", // 30
-        "Glyph", // 31
-        "Golem", // 32
-        "Grim", // 33
-        "Hate", // 34
-        "Havoc", // 35
-        "Honour", // 36
-        "Horror", // 37
-        "Hypnotic", // 38
-        "Kraken", // 39
-        "Loath", // 40
-        "Maelstrom", // 41
-        "Mind", // 42
-        "Miracle", // 43
-        "Morbid", // 44
-        "Oblivion", // 45
-        "Onslaught", // 46
-        "Pain", // 47
-        "Pandemonium", // 48
-        "Phoenix", // 49
-        "Plague", // 50
-        "Rage", // 51
-        "Rapture", // 52
-        "Rune", // 53
-        "Skull", // 54
-        "Sol", // 55
-        "Soul", // 56
-        "Sorrow", // 57
-        "Spirit", // 58
-        "Storm", // 59
-        "Tempest", // 60
-        "Torment", // 61
-        "Vengeance", // 62
-        "Victory", // 63
-        "Viper", // 64
-        "Vortex", // 65
-        "Woe", // 66
-        "Wrath", // 67
-        "Light's", // 68
-        "Shimmering" // 69
-    ];
+    string internal constant namePrefixes =
+        "Agony,Apocalypse,Armageddon,Beast,Behemoth,Blight,Blood,Bramble,Brimstone,Brood,Carrion,Cataclysm,Chimeric,Corpse,Corruption,Damnation,Death,Demon,Dire,Dragon,Dread,Doom,Dusk,Eagle,Empyrean,Fate,Foe,Gale,Ghoul,Gloom,Glyph,Golem,Grim,Hate,Havoc,Honour,Horror,Hypnotic,Kraken,Loath,Maelstrom,Mind,Miracle,Morbid,Oblivion,Onslaught,Pain,Pandemonium,Phoenix,Plague,Rage,Rapture,Rune,Skull,Sol,Soul,Sorrow,Spirit,Storm,Tempest,Torment,Vengeance,Victory,Viper,Vortex,Woe,Wrath,Light's,Shimmering";
     uint256 constant namePrefixesLength = 69;
 
-    string[] internal nameSuffixes = [
-        // <no name>            // 0
-        "Bane", // 1
-        "Root", // 2
-        "Bite", // 3
-        "Song", // 4
-        "Roar", // 5
-        "Grasp", // 6
-        "Instrument", // 7
-        "Glow", // 8
-        "Bender", // 9
-        "Shadow", // 10
-        "Whisper", // 11
-        "Shout", // 12
-        "Growl", // 13
-        "Tear", // 14
-        "Peak", // 15
-        "Form", // 16
-        "Sun", // 17
-        "Moon" // 18
-    ];
+    string internal constant nameSuffixes =
+        "Bane,Root,Bite,Song,Roar,Grasp,Instrument,Glow,Bender,Shadow,Whisper,Shout,Growl,Tear,Peak,Form,Sun,Moon";
     uint256 constant nameSuffixesLength = 18;
 
     string internal constant creatures =
@@ -248,6 +142,26 @@ contract Components {
         );
         uint256 greatness = rand % 21;
         return (greatness >= 19);
+    }
+
+    function getNamePrefixes(uint256 index)
+        internal
+        pure
+        returns (string memory)
+    {
+        return getItemFromCSV(namePrefixes, index);
+    }
+
+    function getNameSuffixes(uint256 index)
+        internal
+        pure
+        returns (string memory)
+    {
+        return getItemFromCSV(nameSuffixes, index);
+    }
+
+    function getSuffixes(uint256 index) internal pure returns (string memory) {
+        return getItemFromCSV(suffixes, index);
     }
 
     function getItemFromCSV(string memory str, uint256 index)

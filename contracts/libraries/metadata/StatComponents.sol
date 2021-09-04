@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "../MetadataUtils.sol";
 
-contract StatComponents {
+library StatComponents {
     function roll(string memory input) internal pure returns (uint256) {
         return (uint256(keccak256(abi.encodePacked(input))) % 6) + 1;
     }

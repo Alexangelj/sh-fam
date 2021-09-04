@@ -8,7 +8,7 @@ import { Base64, toString } from "../MetadataUtils.sol";
 /// the individual items inside a Loot bag.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
-contract Stats is StatComponents {
+library Stats {
     uint256 internal constant STRENGTH = 0x6;
     uint256 internal constant DEXTERITY = 0x7;
     uint256 internal constant CONSTITUTION = 0x8;
@@ -16,14 +16,8 @@ contract Stats is StatComponents {
     uint256 internal constant WISDOM = 0x10;
     uint256 internal constant CHARISMA = 0x11;
 
-    string[] internal itemStats = [
-        "Strength",
-        "Dexterity",
-        "Constitution",
-        "Intelligence",
-        "Wisdom",
-        "Charisma"
-    ];
+    string internal constant itemStats =
+        "Strength,Dexterity,Constitution,Intelligence,Wisdom,Charisma";
 
     struct ItemStats {
         uint256 strength;
@@ -35,7 +29,7 @@ contract Stats is StatComponents {
     }
 
     function getStats(ItemStats memory attr)
-        public
+        internal
         pure
         returns (string memory)
     {
@@ -71,31 +65,31 @@ contract Stats is StatComponents {
         return output;
     }
 
-    function strStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "STRENGTH");
+    function strStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "STRENGTH");
     }
 
-    function dexStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "DEXTERITY");
+    function dexStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "DEXTERITY");
     }
 
-    function conStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "CONSTITUTION");
+    function conStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "CONSTITUTION");
     }
 
-    function intStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "INTELLIGENCE");
+    function intStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "INTELLIGENCE");
     }
 
-    function wisStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "WISDOM");
+    function wisStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "WISDOM");
     }
 
-    function chaStat(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "CHARISMA");
+    function chaStat(uint256 tokenId) internal pure returns (uint256) {
+        return StatComponents.statComponent(tokenId, "CHARISMA");
     }
 
-    function statsOf(uint256 tokenId) public pure returns (ItemStats memory) {
+    function statsOf(uint256 tokenId) internal pure returns (ItemStats memory) {
         return
             ItemStats({
                 strength: strStat(tokenId),

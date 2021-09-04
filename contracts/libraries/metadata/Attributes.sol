@@ -9,7 +9,8 @@ import { Base64, toString } from "../MetadataUtils.sol";
 /// the individual items inside a Shadowling.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
-contract Attributes is Components {
+library Attributes {
+    using Components for uint256;
     uint256 internal constant CREATURE = 0x0;
     uint256 internal constant FLAW = 0x1;
     uint256 internal constant ORIGIN = 0x2;
@@ -17,14 +18,8 @@ contract Attributes is Components {
     uint256 internal constant EYES = 0x4;
     uint256 internal constant NAME = 0x5;
 
-    string[] internal itemTypes = [
-        "Creature",
-        "Flaw",
-        "Origin",
-        "Bloodline",
-        "Eyes",
-        "Name"
-    ];
+    string internal constant itemTypes =
+        "Creature,Flaw,Origin,Bloodline,Eyes,Name";
 
     struct ItemIds {
         uint256 creature;
@@ -112,39 +107,35 @@ contract Attributes is Components {
     }
 
     /// @notice Returns the attributes properties of a `tokenId`
-    function getAttributes(uint256 tokenId)
-        public
-        view
-        returns (string memory)
-    {
-        ItemIds memory attr = ids(tokenId);
+    /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
+    function attributes(uint256 tokenId) public view returns (string memory) {
         ItemProperties memory items = itemProperties(tokenId);
 
         string memory output;
 
         // should we also use components[0] which contains the item name?
         string memory res = string(
-            abi.encodePacked("[", trait(itemTypes[0], items.creature))
+            abi.encodePacked("[", trait(getItemTypes(0), items.creature))
         );
 
         res = string(
-            abi.encodePacked(res, ", ", trait(itemTypes[1], items.flaw))
+            abi.encodePacked(res, ", ", trait(getItemTypes(1), items.flaw))
         );
 
         res = string(
-            abi.encodePacked(res, ", ", trait(itemTypes[2], items.origin))
+            abi.encodePacked(res, ", ", trait(getItemTypes(2), items.origin))
         );
 
         res = string(
-            abi.encodePacked(res, ", ", trait(itemTypes[3], items.bloodline))
+            abi.encodePacked(res, ", ", trait(getItemTypes(3), items.bloodline))
         );
 
         res = string(
-            abi.encodePacked(res, ", ", trait(itemTypes[4], items.eyes))
+            abi.encodePacked(res, ", ", trait(getItemTypes(4), items.eyes))
         );
 
         res = string(
-            abi.encodePacked(res, ", ", trait(itemTypes[5], items.name))
+            abi.encodePacked(res, ", ", trait(getItemTypes(5), items.name))
         );
 
         res = string(abi.encodePacked(res, "]"));
@@ -155,29 +146,29 @@ contract Attributes is Components {
 
     /// @notice Returns the attributes associated with this item.
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
-    function attributes(uint256 id) public view returns (string memory) {
+    function _attributes(uint256 id) internal view returns (string memory) {
         (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         // should we also use components[0] which contains the item name?
-        string memory slot = itemTypes[itemType];
+        string memory slot = getItemTypes(itemType);
         string memory res = string(abi.encodePacked("[", trait("Slot", slot)));
 
         string memory item = baseItem(itemType, components[0]);
         res = string(abi.encodePacked(res, ", ", trait("Item", item)));
 
         if (components[1] > 0) {
-            string memory data = suffixes[components[1] - 1];
+            string memory data = Components.getSuffixes(components[1] - 1);
             res = string(abi.encodePacked(res, ", ", trait("Suffix", data)));
         }
 
         if (components[2] > 0) {
-            string memory data = namePrefixes[components[2] - 1];
+            string memory data = Components.getNamePrefixes(components[2] - 1);
             res = string(
                 abi.encodePacked(res, ", ", trait("Name Prefix", data))
             );
         }
 
         if (components[3] > 0) {
-            string memory data = nameSuffixes[components[3] - 1];
+            string memory data = Components.getNameSuffixes(components[3] - 1);
             res = string(
                 abi.encodePacked(res, ", ", trait("Name Suffix", data))
             );
@@ -230,22 +221,22 @@ contract Attributes is Components {
     {
         string memory arr;
         if (itemType == CREATURE) {
-            arr = creatures;
+            arr = Components.creatures;
         } else if (itemType == FLAW) {
-            arr = flaws;
+            arr = Components.flaws;
         } else if (itemType == ORIGIN) {
-            arr = birthplaces;
+            arr = Components.birthplaces;
         } else if (itemType == BLOODLINE) {
-            arr = bloodlines;
+            arr = Components.bloodlines;
         } else if (itemType == EYES) {
-            arr = eyes;
+            arr = Components.eyes;
         } else if (itemType == NAME) {
-            arr = names;
+            arr = Components.names;
         } else {
             revert("Too shadowy");
         }
 
-        return getItemFromCSV(arr, idx);
+        return Components.getItemFromCSV(arr, idx);
     }
 
     // Creates the token description given its components and what type it is
@@ -263,7 +254,14 @@ contract Attributes is Components {
         // add the suffix
         if (components[1] > 0) {
             item = string(
-                abi.encodePacked(item, " ", suffixes[components[1] - 1])
+                abi.encodePacked(
+                    item,
+                    " ",
+                    Components.getItemFromCSV(
+                        Components.suffixes,
+                        components[1] - 1
+                    )
+                )
             );
         }
 
@@ -271,14 +269,17 @@ contract Attributes is Components {
         if (components[2] > 0) {
             // prefix
             string memory namePrefixSuffix = string(
-                abi.encodePacked("'", namePrefixes[components[2] - 1])
+                abi.encodePacked(
+                    "'",
+                    Components.getNamePrefixes(components[2] - 1)
+                )
             );
             if (components[3] > 0) {
                 namePrefixSuffix = string(
                     abi.encodePacked(
                         namePrefixSuffix,
                         " ",
-                        nameSuffixes[components[3] - 1]
+                        Components.getNameSuffixes(components[3] - 1)
                     )
                 );
             }
@@ -298,27 +299,27 @@ contract Attributes is Components {
 
     // View helpers for getting the item ID that corresponds to a bag's items
     function creatureId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(creatureComponents(tokenId), CREATURE);
+        return TokenId.toId(tokenId.creatureComponents(), CREATURE);
     }
 
     function flawId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(flawComponents(tokenId), FLAW);
+        return TokenId.toId(tokenId.flawComponents(), FLAW);
     }
 
     function birthplaceId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(birthplaceComponents(tokenId), ORIGIN);
+        return TokenId.toId(tokenId.birthplaceComponents(), ORIGIN);
     }
 
     function bloodlineId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(bloodlineComponents(tokenId), BLOODLINE);
+        return TokenId.toId(tokenId.bloodlineComponents(), BLOODLINE);
     }
 
     function eyesId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(eyeComponents(tokenId), EYES);
+        return TokenId.toId(tokenId.eyeComponents(), EYES);
     }
 
     function nameId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(nameComponents(tokenId), NAME);
+        return TokenId.toId(tokenId.nameComponents(), NAME);
     }
 
     // Given an erc721 bag, returns the erc1155 token ids of the items in the bag
@@ -378,5 +379,9 @@ contract Attributes is Components {
         }
 
         return allNames;
+    }
+
+    function getItemTypes(uint256 index) internal pure returns (string memory) {
+        return Components.getItemFromCSV(itemTypes, index);
     }
 }
