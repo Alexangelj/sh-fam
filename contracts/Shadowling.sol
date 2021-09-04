@@ -4,7 +4,7 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "./libraries/ShadowlingMetadata.sol";
+import "./libraries/metadata/ShadowlingMetadata.sol";
 
 contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
     constructor() ERC1155("") {}
@@ -29,20 +29,14 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         // NB: We patched ERC1155 to expose `_balances` so
         // that we can manually mint to a user, and manually emit a `TransferBatch`
         // event. If that's unsafe, we can fallback to using _mint
-        uint256[] memory ids = new uint256[](11);
-        uint256[] memory amounts = new uint256[](11);
+        uint256[] memory ids = new uint256[](6);
+        uint256[] memory amounts = new uint256[](6);
         ids[0] = itemId(tokenId, creatureComponents, CREATURE);
         ids[1] = itemId(tokenId, flawComponents, FLAW);
-        ids[2] = itemId(tokenId, birthplaceComponents, BIRTHPLACE);
+        ids[2] = itemId(tokenId, birthplaceComponents, ORIGIN);
         ids[3] = itemId(tokenId, bloodlineComponents, BLOODLINE);
         ids[4] = itemId(tokenId, eyeComponents, EYES);
         ids[5] = itemId(tokenId, nameComponents, NAME);
-        ids[6] = statId(tokenId, STRENGTH, "STRENGTH");
-        ids[7] = statId(tokenId, DEXTERITY, "DEXTERITY");
-        ids[8] = statId(tokenId, CONSTITUTION, "CONSTITUTION");
-        ids[9] = statId(tokenId, INTELLIGENCE, "INTELLIGENCE");
-        ids[10] = statId(tokenId, WISDOM, "WISDOM");
-        ids[11] = statId(tokenId, CHARISMA, "CHARISMA");
         for (uint256 i = 0; i < ids.length; i++) {
             amounts[i] = 1;
             // +21k per call / unavoidable - requires patching OZ
@@ -60,16 +54,10 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         // 1. burn the items
         burnItem(tokenId, creatureComponents, CREATURE);
         burnItem(tokenId, flawComponents, FLAW);
-        burnItem(tokenId, birthplaceComponents, BIRTHPLACE);
+        burnItem(tokenId, birthplaceComponents, ORIGIN);
         burnItem(tokenId, bloodlineComponents, BLOODLINE);
         burnItem(tokenId, eyeComponents, EYES);
         burnItem(tokenId, nameComponents, NAME);
-        burnStat(tokenId, STRENGTH, "STRENGTH");
-        burnStat(tokenId, DEXTERITY, "DEXTERITY");
-        burnStat(tokenId, CONSTITUTION, "CONSTITUTION");
-        burnStat(tokenId, INTELLIGENCE, "INTELLIGENCE");
-        burnStat(tokenId, WISDOM, "WISDOM");
-        burnStat(tokenId, CHARISMA, "CHARISMA");
 
         // 2. give back the bag
         safeTransferFrom(address(this), msg.sender, tokenId, 1, new bytes(0));
@@ -84,15 +72,6 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         return TokenId.toId(components, itemType);
     }
 
-    function statId(
-        uint256 tokenId,
-        uint256 itemType,
-        string memory keyPrefix
-    ) private view returns (uint256) {
-        uint256[5] memory components;
-        return TokenId.toId(components, itemType);
-    }
-
     /// @notice Extracts the components associated with the ERC721 Loot bag using
     /// dhof's LootComponents utils and proceeds to burn a token for the corresponding
     /// item from the msg.sender.
@@ -102,16 +81,6 @@ contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
         uint256 itemType
     ) private {
         uint256[5] memory components = componentsFn(tokenId);
-        uint256 id = TokenId.toId(components, itemType);
-        _burn(msg.sender, id, 1);
-    }
-
-    function burnStat(
-        uint256 tokenId,
-        uint256 itemType,
-        string memory keyPrefix
-    ) private {
-        uint256[5] memory components; //statComponent(tokenId, keyPrefix);
         uint256 id = TokenId.toId(components, itemType);
         _burn(msg.sender, id, 1);
     }

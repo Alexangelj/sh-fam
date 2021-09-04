@@ -2,58 +2,34 @@
 pragma solidity ^0.8.0;
 
 import "./Components.sol";
-import "./TokenId.sol";
-import { Base64, toString } from "./MetadataUtils.sol";
+import "../TokenId.sol";
+import { Base64, toString } from "../MetadataUtils.sol";
 
 /// @title Helper contract for generating ERC-1155 token ids and descriptions for
 /// the individual items inside a Loot bag.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
-contract ShadowlingMetadata is Components {
+contract Attributes is Components {
     uint256 internal constant CREATURE = 0x0;
     uint256 internal constant FLAW = 0x1;
-    uint256 internal constant BIRTHPLACE = 0x2;
+    uint256 internal constant ORIGIN = 0x2;
     uint256 internal constant BLOODLINE = 0x3;
     uint256 internal constant EYES = 0x4;
     uint256 internal constant NAME = 0x5;
-    uint256 internal constant STRENGTH = 0x6;
-    uint256 internal constant DEXTERITY = 0x7;
-    uint256 internal constant CONSTITUTION = 0x8;
-    uint256 internal constant INTELLIGENCE = 0x9;
-    uint256 internal constant WISDOM = 0x10;
-    uint256 internal constant CHARISMA = 0x11;
 
     string[] internal itemTypes = [
         "Creature",
         "Flaw",
-        "Birthplace",
+        "Origin",
         "Bloodline",
         "Eyes",
         "Name"
     ];
 
-    string[] internal itemStats = [
-        "Strength",
-        "Dexterity",
-        "Constitution",
-        "Intelligence",
-        "Wisdom",
-        "Charisma"
-    ];
-
-    struct ItemStats {
-        uint256 strength;
-        uint256 dexterity;
-        uint256 constitution;
-        uint256 intelligence;
-        uint256 wisdom;
-        uint256 charisma;
-    }
-
     struct ItemIds {
         uint256 creature;
         uint256 flaw;
-        uint256 birthplace;
+        uint256 origin;
         uint256 bloodline;
         uint256 eyes;
         uint256 name;
@@ -61,102 +37,48 @@ contract ShadowlingMetadata is Components {
     struct ItemNames {
         string creature;
         string flaw;
-        string birthplace;
+        string origin;
         string bloodline;
         string eyes;
         string name;
     }
 
-    function name() external pure returns (string memory) {
-        return "Shadowling";
-    }
-
-    function symbol() external pure returns (string memory) {
-        return "SHDW";
-    }
-
-    /// @dev Opensea contract metadata: https://docs.opensea.io/docs/contract-level-metadata
-    function contractURI() external pure returns (string memory) {
-        string
-            memory json = '{"name": "Shadowling", "description": "Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond..."}';
-        string memory encodedJson = Base64.encode(bytes(json));
-        string memory output = string(
-            abi.encodePacked("data:application/json;base64,", encodedJson)
-        );
-
-        return output;
-    }
-
-    function getStats(ItemStats memory attr)
+    /// @notice Returns an SVG for the provided token id
+    function getImage(uint256 tokenId, string memory last)
         public
         view
         returns (string memory)
     {
-        string[11] memory stats;
+        ItemNames memory names = itemNames(tokenId);
 
-        stats[0] = toString(attr.strength);
-        stats[1] = '</text><text x="10" y="180" class="base">';
-        stats[2] = toString(attr.dexterity);
-        stats[3] = '</text><text x="10" y="200" class="base">';
-        stats[4] = toString(attr.constitution);
-        stats[5] = '</text><text x="10" y="220" class="base">';
-        stats[6] = toString(attr.intelligence);
-        stats[7] = '</text><text x="10" y="240" class="base">';
-        stats[8] = toString(attr.wisdom);
-        stats[9] = '</text><text x="10" y="260" class="base">';
-        stats[10] = toString(attr.charisma);
-
-        string memory output = string(
-            abi.encodePacked(
-                stats[0],
-                stats[1],
-                stats[2],
-                stats[3],
-                stats[4],
-                stats[5],
-                stats[6],
-                stats[7],
-                stats[8]
-            )
-        );
-
-        output = string(abi.encodePacked(output, stats[9], stats[10]));
-        return output;
-    }
-
-    /// @notice Returns an SVG for the provided token id
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
-        ItemNames memory attr = itemNames(tokenId);
         string[13] memory parts;
         parts[
             0
         ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
 
-        parts[1] = attr.creature;
+        parts[1] = names.creature;
 
         parts[2] = '</text><text x="10" y="40" class="base">';
 
-        parts[3] = attr.flaw;
+        parts[3] = names.flaw;
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
-        parts[5] = attr.birthplace;
+        parts[5] = names.origin;
 
         parts[6] = '</text><text x="10" y="80" class="base">';
 
-        parts[7] = attr.bloodline;
+        parts[7] = names.bloodline;
 
         parts[8] = '</text><text x="10" y="120" class="base">';
 
-        parts[9] = attr.eyes;
+        parts[9] = names.eyes;
 
         parts[10] = '</text><text x="10" y="140" class="base">';
 
-        parts[11] = attr.name;
+        parts[11] = names.name;
 
         parts[12] = '</text><text x="10" y="160" class="base">';
-
-        string memory last = "</text></svg>";
 
         string memory output = string(
             abi.encodePacked(
@@ -171,37 +93,34 @@ contract ShadowlingMetadata is Components {
                 parts[8]
             )
         );
+
         output = string(
             abi.encodePacked(output, parts[9], parts[10], parts[11], parts[12])
         );
 
-        output = string(
-            abi.encodePacked(output, getStats(statsOf(tokenId)), last)
-        );
+        output = string(abi.encodePacked(output, last, "</text></svg>"));
 
-        string memory json = Base64.encode(
-            bytes(
-                string(
-                    abi.encodePacked(
-                        '{ "name": "',
-                        tokenName(tokenId),
-                        '", ',
-                        '"description" : ',
-                        '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        '"image": "data:image/svg+xml;base64,',
-                        Base64.encode(bytes(output)),
-                        '", '
-                        '"attributes": ',
-                        attributes(tokenId),
-                        "}"
-                    )
-                )
+        output = string(
+            abi.encodePacked(
+                '"image": "data:image/svg+xml;base64,',
+                Base64.encode(bytes(output)),
+                '", '
             )
         );
-        output = string(
-            abi.encodePacked("data:application/json;base64,", json)
-        );
 
+        return output;
+    }
+
+    /// @notice Returns the attributes properties of a `tokenId`
+    function getAttributes(uint256 tokenId)
+        public
+        view
+        returns (string memory)
+    {
+        ItemIds memory attr = ids(tokenId);
+        string memory output = string(
+            abi.encodePacked('"attributes": ', attributes(attr.creature), "}")
+        );
         return output;
     }
 
@@ -274,11 +193,6 @@ contract ShadowlingMetadata is Components {
         return componentsToString(components, itemType);
     }
 
-    function statId(uint256 id) public view returns (string memory) {
-        (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
-        return componentsToString(components, itemType);
-    }
-
     // Returns the "vanilla" item name w/o any prefix/suffixes or augmentations
     function itemName(uint256 itemType, uint256 idx)
         public
@@ -290,7 +204,7 @@ contract ShadowlingMetadata is Components {
             arr = creatures;
         } else if (itemType == FLAW) {
             arr = flaws;
-        } else if (itemType == BIRTHPLACE) {
+        } else if (itemType == ORIGIN) {
             arr = birthplaces;
         } else if (itemType == BLOODLINE) {
             arr = bloodlines;
@@ -298,18 +212,6 @@ contract ShadowlingMetadata is Components {
             arr = eyes;
         } else if (itemType == NAME) {
             arr = names;
-        } else if (itemType == STRENGTH) {
-            arr = stats;
-        } else if (itemType == DEXTERITY) {
-            arr = stats;
-        } else if (itemType == CONSTITUTION) {
-            arr = stats;
-        } else if (itemType == INTELLIGENCE) {
-            arr = stats;
-        } else if (itemType == WISDOM) {
-            arr = stats;
-        } else if (itemType == CHARISMA) {
-            arr = stats;
         } else {
             revert("Too shadowy");
         }
@@ -375,7 +277,7 @@ contract ShadowlingMetadata is Components {
     }
 
     function birthplaceId(uint256 tokenId) public pure returns (uint256) {
-        return TokenId.toId(birthplaceComponents(tokenId), BIRTHPLACE);
+        return TokenId.toId(birthplaceComponents(tokenId), ORIGIN);
     }
 
     function bloodlineId(uint256 tokenId) public pure returns (uint256) {
@@ -390,37 +292,13 @@ contract ShadowlingMetadata is Components {
         return TokenId.toId(nameComponents(tokenId), NAME);
     }
 
-    function strengthId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "STRENGTH");
-    }
-
-    function dexterityId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "DEXTERITY");
-    }
-
-    function constitutionId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "CONSTITUTION");
-    }
-
-    function intelligenceId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "INTELLIGENCE");
-    }
-
-    function wisdomId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "WISDOM");
-    }
-
-    function charismaId(uint256 tokenId) public pure returns (uint256) {
-        return statComponent(tokenId, "CHARISMA");
-    }
-
     // Given an erc721 bag, returns the erc1155 token ids of the items in the bag
     function ids(uint256 tokenId) public pure returns (ItemIds memory) {
         return
             ItemIds({
                 creature: creatureId(tokenId),
                 flaw: flawId(tokenId),
-                birthplace: birthplaceId(tokenId),
+                origin: birthplaceId(tokenId),
                 bloodline: bloodlineId(tokenId),
                 eyes: eyesId(tokenId),
                 name: nameId(tokenId)
@@ -447,22 +325,10 @@ contract ShadowlingMetadata is Components {
             ItemNames({
                 creature: tokenName(items.creature),
                 flaw: tokenName(items.flaw),
-                birthplace: tokenName(items.birthplace),
+                origin: tokenName(items.origin),
                 bloodline: tokenName(items.bloodline),
                 eyes: tokenName(items.eyes),
                 name: tokenName(items.name)
-            });
-    }
-
-    function statsOf(uint256 tokenId) public view returns (ItemStats memory) {
-        return
-            ItemStats({
-                strength: strengthId(tokenId),
-                dexterity: dexterityId(tokenId),
-                constitution: constitutionId(tokenId),
-                intelligence: intelligenceId(tokenId),
-                wisdom: wisdomId(tokenId),
-                charisma: charismaId(tokenId)
             });
     }
 

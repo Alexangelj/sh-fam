@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "./strings.sol";
-import "./MetadataUtils.sol";
+import "../strings.sol";
+import "../MetadataUtils.sol";
 
 contract Components {
     using strings for string;
@@ -151,16 +151,8 @@ contract Components {
         "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
     uint256 internal constant namesLength = 186;
 
-    string internal constant stats =
-        "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
-    uint256 internal constant statsLength = 186;
-
     function random(string memory input) internal pure returns (uint256) {
         return uint256(keccak256(abi.encodePacked(input)));
-    }
-
-    function roll(string memory input) internal pure returns (uint256) {
-        return (uint256(keccak256(abi.encodePacked(input))) % 6) + 1;
     }
 
     function creatureComponents(uint256 tokenId)
@@ -212,46 +204,6 @@ contract Components {
         return pluck(tokenId, "NAME", names, namesLength, true);
     }
 
-    function statComponent(uint256 tokenId, string memory keyPrefix)
-        internal
-        pure
-        returns (uint256)
-    {
-        return pluckStat(tokenId, keyPrefix);
-    }
-
-    function pluckStat(uint256 tokenId, string memory keyPrefix)
-        internal
-        pure
-        returns (uint256)
-    {
-        uint256 roll1 = roll(
-            string(abi.encodePacked(keyPrefix, toString(tokenId), "1"))
-        );
-        uint256 min = roll1;
-        uint256 roll2 = roll(
-            string(abi.encodePacked(keyPrefix, toString(tokenId), "2"))
-        );
-        min = min > roll2 ? roll2 : min;
-        uint256 roll3 = roll(
-            string(abi.encodePacked(keyPrefix, toString(tokenId), "3"))
-        );
-        min = min > roll3 ? roll3 : min;
-        uint256 roll4 = roll(
-            string(abi.encodePacked(keyPrefix, toString(tokenId), "4"))
-        );
-        min = min > roll4 ? roll4 : min;
-
-        // get 3 highest dice rolls
-        uint256 stat = roll1 + roll2 + roll3 + roll4 - min;
-        return stat;
-        /* string memory output = string(
-            abi.encodePacked(keyPrefix, ": ", toString(stat))
-        );
-
-        return output; */
-    }
-
     function pluck(
         uint256 tokenId,
         string memory keyPrefix,
@@ -285,23 +237,6 @@ contract Components {
 
         return components;
     }
-
-    /* function pluck(
-        uint256 tokenId,
-        string memory keyPrefix,
-        string memory sourceCSV,
-        uint256 sourceCSVLength,
-        bool rareTrait
-    ) internal pure returns (string memory) {
-        uint256 rand = random(
-            string(abi.encodePacked(keyPrefix, toString(tokenId)))
-        );
-        if (!rareTrait || shouldGib(tokenId, keyPrefix)) {
-            return getItemFromCSV(sourceCSV, rand % sourceCSVLength);
-        } else {
-            return "";
-        }
-    } */
 
     function shouldGib(uint256 tokenId, string memory keyPrefix)
         internal
