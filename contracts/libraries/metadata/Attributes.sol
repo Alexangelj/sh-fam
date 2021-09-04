@@ -40,7 +40,7 @@ library Attributes {
 
     /// @notice Returns an SVG for the provided token id
     function getImage(uint256 tokenId, string memory last)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -108,7 +108,7 @@ library Attributes {
 
     /// @notice Returns the attributes properties of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
-    function attributes(uint256 tokenId) public view returns (string memory) {
+    function attributes(uint256 tokenId) internal view returns (string memory) {
         ItemProperties memory items = itemProperties(tokenId);
 
         string memory output;
@@ -208,14 +208,14 @@ library Attributes {
 
     // @notice Given an ERC1155 token id, it returns its name by decoding and parsing
     // the id
-    function tokenProperty(uint256 id) public view returns (string memory) {
+    function tokenProperty(uint256 id) internal view returns (string memory) {
         (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         return componentsToString(components, itemType);
     }
 
     // Returns the "vanilla" item name w/o any prefix/suffixes or augmentations
     function baseItem(uint256 itemType, uint256 idx)
-        public
+        internal
         pure
         returns (string memory)
     {
@@ -241,7 +241,7 @@ library Attributes {
 
     // Creates the token description given its components and what type it is
     function componentsToString(uint256[5] memory components, uint256 itemType)
-        public
+        internal
         view
         returns (string memory)
     {
@@ -298,32 +298,32 @@ library Attributes {
     }
 
     // View helpers for getting the item ID that corresponds to a bag's items
-    function creatureId(uint256 tokenId) public pure returns (uint256) {
+    function creatureId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.creatureComponents(), CREATURE);
     }
 
-    function flawId(uint256 tokenId) public pure returns (uint256) {
+    function flawId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.flawComponents(), FLAW);
     }
 
-    function birthplaceId(uint256 tokenId) public pure returns (uint256) {
+    function birthplaceId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.birthplaceComponents(), ORIGIN);
     }
 
-    function bloodlineId(uint256 tokenId) public pure returns (uint256) {
+    function bloodlineId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.bloodlineComponents(), BLOODLINE);
     }
 
-    function eyesId(uint256 tokenId) public pure returns (uint256) {
+    function eyesId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.eyeComponents(), EYES);
     }
 
-    function nameId(uint256 tokenId) public pure returns (uint256) {
+    function nameId(uint256 tokenId) internal pure returns (uint256) {
         return TokenId.toId(tokenId.nameComponents(), NAME);
     }
 
     // Given an erc721 bag, returns the erc1155 token ids of the items in the bag
-    function ids(uint256 tokenId) public pure returns (ItemIds memory) {
+    function ids(uint256 tokenId) internal pure returns (ItemIds memory) {
         return
             ItemIds({
                 creature: creatureId(tokenId),
@@ -336,7 +336,7 @@ library Attributes {
     }
 
     function idsMany(uint256[] memory tokenIds)
-        public
+        internal
         pure
         returns (ItemIds[] memory)
     {
@@ -350,7 +350,7 @@ library Attributes {
 
     // Given an ERC721 bag, returns the names of the items in the bag
     function itemProperties(uint256 tokenId)
-        public
+        internal
         view
         returns (ItemProperties memory)
     {
@@ -367,7 +367,7 @@ library Attributes {
     }
 
     function namesMany(uint256[] memory tokenNames)
-        public
+        internal
         view
         returns (ItemProperties[] memory)
     {
