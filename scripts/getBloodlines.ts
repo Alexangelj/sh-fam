@@ -7,15 +7,17 @@ async function main() {
 
   const accounts = await ethers.getSigners()
 
-  let epithets = xmons.xmons.map((xmon: any) => xmon.Epithets)
-  epithets = epithets.reduce((prev, curr) => prev + "," + curr)
+  //let epithets = xmons.xmons.map((xmon: any) => xmon.Epithets)
+  let epithets = xmons.xmons.map((xmon: any) => xmon.InputHash)
+  function callbk(prev: any, curr: any, index: any) {
+    if (index > 32) return prev
+    return prev + "," + curr
+  }
+  epithets = epithets.reduce(callbk)
 
   await fs.promises.writeFile("./epithets.json", JSON.stringify(epithets))
 
-  console.log(
-    "Accounts:",
-    accounts.map((a) => a.address)
-  )
+  console.log("Seeds:", epithets)
 }
 
 main()

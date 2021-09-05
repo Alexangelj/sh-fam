@@ -22,8 +22,8 @@ library Components {
     uint256 constant nameSuffixesLength = 18;
 
     string internal constant creatures =
-        "Dragon,Manticore,Dire Wolf,Kraken,Giant,Unicorn,Griffin,Pegasus,Chimera,Yeti,Kappa,Hellhound,Demon,Werewolf,Rat King,White Stag,Minotaur,Giant Primate";
-    uint256 internal constant creaturesLength = 18;
+        "None,Dragon,Manticore,Dire Wolf,Kraken,Giant,Unicorn,Griffin,Pegasus,Chimera,Yeti,Kappa,Hellhound,Demon,Werewolf,Rat King,White Stag,Minotaur,Giant Primate";
+    uint256 internal constant creaturesLength = 19;
 
     string internal constant flaws =
         "Missing Eye,Missing Tooth,Dragon Scar,Missing Ear,Eye Scar,Face Scar,Body Scar,Missing Tail,Burnt Arm,Broken Claw,Missing Claw,Burnt Face,Neck Scar,Divine Markings,Burnt Body";
@@ -34,8 +34,9 @@ library Components {
     uint256 internal constant originsLength = 4;
 
     string internal constant bloodlines =
-        "Genesis,The Judge of Cogito,Jqzl wn Xzwuqam,The Amalgam,The Devourer of Worlds";
-    uint256 internal constant bloodlinesLength = 5;
+        "QmTWXhdXKcw6RXhKPcBhWVmj12wRLvYcgrSpT1nikmBtGv,QmfJsL7Lh2jrRqaTMxorT7qRuMuDSW7jLMb2vQuyMhHokk,QmdcDCzGVTo2VPwj1haCuPoop5SkC9BFroXU4aw9Hza67e,QmenTr74f5Hn5SkJT1NTEFWSaT49F8fi2onT146UwgdshR,QmfVgziuVbPovhQqKgW8J3DQYRieQx9PmHNSe4yUbZYT4W,QmSXxRgxn2hevEDXDw1KPMNpBrTxGAZXAbfCsXRbKQ7FNR,QmYD8wuKLojhuR7VyJTBxEwFjpTFQciLU5QmKfD1k4SeVF,QmPEgBRK6wGhCkKPwAw9j2Na86cp77fmjtMVfT5V4VYWpQ,QmWuHooTjwnDZw4CS58bUWwoSUP9PMjp3vxN3Rmkc3JDU2,QmWhZ9rYPU7S5hkGv4gXQuqMu85Z87oWK1f3hCFK2T9fbD,QmSmxeYAQsHeV5cY75ijruASZ4HpG64SskdTLVYUzBmJUm,Qmbje3tHZNXnCYz3mfzFxQ2ZzpXNYtwWRCoviLC29euWud,QmR7VG4etp7ueP1yoFw7uaZGCLckcf4qhkbTaTK5C8Wd2E,QmPRDQX7GekyKsispCZKJ4cRLxwhVBN3TbWEAqMLPZvqec,QmRwUvuDja6Ss2NNKUnBqsJhHaDMNyW6FdzzSVG77ACcaz,QmcTZRpjWd9b4FkPSR5bGwx3r5cko9jqks5H5b81rjCjLp,QmV3Pbskd7D4DPmseyojXo4E8uzm6rbiPASh6b2TpU38n4,QmWYFJDqDuDrKikgAJj45Mr5gQ37dPywK6D5giFerT3oVG,QmavyWUXwnpvgMHad2pXkALe1WHq9pJatFkqW67p7Nv5Jm,QmSwu6wHHHu8DYXZB9HXRpc2mnrAUYFQbbLHmzMgxxEKZq,QmQJitWq2HjuBsrfm5W4zzsAowe5agM2pbeDg5a43Fh2cv,QmPCGrxrJ77VRzCMpmgFszFx9Ky2FXhHrNKtv8kfBA276Y,QmeenofHLBmbPDvh6bf9pDwXXtuerGunDLYRjpurmV3qt2,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,QmXpXZWi7PQdZuYg1aBr8oDbgaVmSXY2D1rRDnjQ8Ax5zK,Qmc3DYKkQX9tXfy4c5qzc6KKKSUYu1iEwZRNkZpgXRNTsR,QmVQ1VjppWsuspouBKNB73Wk1K1U273zVAwJPuW8aEKK9N,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,Qmb3ZVTSX4bHR7WaRVeupnnnZ9wvov9HHA4zdpZVL8hcyi,QmUm6BeTkSu8brGG1ZwXENBuUihPGLX79whA9t1ZrKhjkQ,QmPcfHotn4MCtuMk5HnPSTEr2jjaonoGUZBNM9zs8Y9X9S,QmPCTkdEAsALUYQcdbmpbZrgCSMfgX9x7UsVFqtGCEn7JN,QmdUwtdf3UwZhPcWi1Qw1DPoANdPcdPZQSz95tpc8sSX5w";
+    //"Genesis,The Judge of Cogito,Jqzl wn Xzwuqam,The Amalgam,The Devourer of Worlds";
+    uint256 internal constant bloodlinesLength = 32;
 
     string internal constant eyes =
         "Gold Eyes,Blue Eyes,Violet Eyes,Red Eyes,Green Eyes";
@@ -71,7 +72,14 @@ library Components {
         returns (uint256[5] memory)
     {
         if (shadowChain)
-            return pluck(tokenId, "ORIGIN", "Shadowchain", 1, false);
+            return
+                pluck(
+                    tokenId,
+                    "ORIGIN",
+                    "Shadowchain,Shadowchain,Shadowchain,ShadowChain",
+                    5,
+                    false
+                );
         return pluck(tokenId, "ORIGIN", origins, originsLength, false);
     }
 
