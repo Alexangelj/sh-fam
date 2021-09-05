@@ -11,12 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IVoid.sol";
 
 /// @notice Mints VOID in exchange for whitelisted NFTs
-contract VoidPortal is
-    Ownable,
-    ReentrancyGuard,
-    IERC1155Receiver,
-    IERC721Receiver
-{
+contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
     /// @notice Cost of the NFT with `address`, denominated in VOID tokens
     mapping(address => uint256) public cost;
     /// @notice Additional premium cost of an NFT with `id`, denominated in VOID tokens

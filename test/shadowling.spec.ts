@@ -1,25 +1,11 @@
 import hre, { ethers } from "hardhat"
 import { Signer, Contract } from "ethers"
 import fs from "fs"
-import { hrtime } from "process"
+
+import { log, parseTokenURI, parseImage } from "./shared/utils"
 
 describe("Shadowling", function () {
   let accounts: Signer[], sh: Contract, tokenId: number
-
-  const parseTokenURI = (uri: string) => {
-    const json = Buffer.from(uri.substring(29), "base64").toString() //(uri.substring(29));
-    const result = JSON.parse(json)
-    return result
-  }
-
-  const parseImage = (json: any) => {
-    const imageHeader = "data:image/svg+xml;base64,"
-    const image = Buffer.from(
-      json.image.substring(imageHeader.length),
-      "base64"
-    ).toString()
-    return image
-  }
 
   beforeEach(async function () {
     accounts = await ethers.getSigners()
@@ -37,10 +23,6 @@ describe("Shadowling", function () {
 
     tokenId = Math.floor(6969 * Math.random())
   })
-
-  function log(val: string, id?: string) {
-    console.log(id ? id : "", val)
-  }
 
   it("should claim tokenId 1, print its props, then change it and re print", async function () {
     await sh.claim(tokenId)
@@ -99,7 +81,7 @@ describe("Shadowling", function () {
     log(json)
   })
 
-  it.skip("should claim until 50", async function () {
+  it("should claim until 50", async function () {
     let images = []
     let imageData: any = {}
     for (let i = 0; i < 50; i++) {

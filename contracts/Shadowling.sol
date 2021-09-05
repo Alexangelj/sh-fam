@@ -4,20 +4,14 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 import "./libraries/metadata/ShadowlingMetadata.sol";
-import "./libraries/metadata/DNA.sol";
+import "./libraries/Random.sol";
 import "./libraries/MetadataUtils.sol";
 import "./libraries/Currency.sol";
 
 import "hardhat/console.sol";
 
-contract Shadowling is
-    ShadowlingMetadata,
-    ERC1155,
-    IERC1155Receiver,
-    ReentrancyGuard
-{
+contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
     constructor() ERC1155("") {}
 
     error CurrencyError();
@@ -46,7 +40,7 @@ contract Shadowling is
 
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
     function claim(uint256 tokenId) external nonReentrant onlyShadows(tokenId) {
-        Attributes.ItemIds memory state = getAll(tokenId);
+        Attributes.ItemIds memory state = Attributes.ids(tokenId);
 
         propertiesOf[tokenId] = state;
         minted.push(tokenId);
@@ -59,27 +53,12 @@ contract Shadowling is
         nonReentrant
         onlyShadows(tokenId)
     {
-        Attributes.ItemIds memory state = getAll(tokenId);
+        Attributes.ItemIds memory state = Attributes.ids(tokenId);
         state.origin = Attributes.originId(tokenId, true);
 
         propertiesOf[tokenId] = state;
         minted.push(tokenId);
         _mint(_msgSender(), tokenId, 1, new bytes(0));
-    }
-
-    function getAll(uint256 tokenId)
-        internal
-        returns (Attributes.ItemIds memory)
-    {
-        return
-            Attributes.ItemIds({
-                creature: Attributes.creatureId(tokenId),
-                flaw: Attributes.flawId(tokenId),
-                origin: Attributes.originId(tokenId, false),
-                bloodline: Attributes.bloodlineId(tokenId),
-                eyes: Attributes.eyesId(tokenId),
-                name: Attributes.nameId(tokenId)
-            });
     }
 
     function modify(uint256 tokenId, uint256 currencyId)
@@ -91,9 +70,9 @@ contract Shadowling is
         _burn(_msgSender(), currencyId, 1); // send the currency back to the shadowchain
         Attributes.ItemIds memory cache = propertiesOf[tokenId]; // cache the shadowling props
 
-        string memory bloodline = Attributes.tokenProperty(cache.bloodline);
-        uint256 startSeed = DNA.getBloodSeed(tokenId, bloodline);
-        string memory sequence = DNA.sequence(startSeed).seq;
+        string memory bloodline = Attributes.encodedIdToString(cache.bloodline);
+        uint256 startSeed = Random.getBloodSeed(tokenId, bloodline);
+        string memory sequence = Random.sequence(startSeed);
         uint256 seed = uint256(
             keccak256(
                 abi.encodePacked("MODIFY", toString(currencyId), sequence)
@@ -117,34 +96,5 @@ contract Shadowling is
         cache.name = values[3] > 0 ? Attributes.nameId(values[3]) : 0;
 
         propertiesOf[tokenId] = cache;
-    }
-
-    function onERC1155Received(
-        address,
-        address from,
-        uint256 tokenId,
-        uint256,
-        bytes calldata
-    )
-        external
-        override(IERC1155Receiver)
-        onlyShadows(tokenId)
-        returns (bytes4)
-    {
-        // only supports callback from this contract
-        require(msg.sender == address(this));
-        return IERC1155Receiver.onERC1155Received.selector;
-    }
-
-    function onERC1155BatchReceived(
-        address operator,
-        address from,
-        uint256[] calldata ids,
-        uint256[] calldata values,
-        bytes calldata data
-    ) external override(IERC1155Receiver) returns (bytes4) {}
-
-    function uri(uint256 tokenId) public view override returns (string memory) {
-        return tokenURI(tokenId);
     }
 }

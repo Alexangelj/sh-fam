@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 import "../strings.sol";
 import "../MetadataUtils.sol";
+import "../Random.sol";
 
+/// @notice Inspired by LootComponents by dhof
+/// @dev    Raw materials arrays and a plucker
 library Components {
     using strings for string;
     using strings for strings.slice;
@@ -35,7 +37,6 @@ library Components {
 
     string internal constant bloodlines =
         "QmTWXhdXKcw6RXhKPcBhWVmj12wRLvYcgrSpT1nikmBtGv,QmfJsL7Lh2jrRqaTMxorT7qRuMuDSW7jLMb2vQuyMhHokk,QmdcDCzGVTo2VPwj1haCuPoop5SkC9BFroXU4aw9Hza67e,QmenTr74f5Hn5SkJT1NTEFWSaT49F8fi2onT146UwgdshR,QmfVgziuVbPovhQqKgW8J3DQYRieQx9PmHNSe4yUbZYT4W,QmSXxRgxn2hevEDXDw1KPMNpBrTxGAZXAbfCsXRbKQ7FNR,QmYD8wuKLojhuR7VyJTBxEwFjpTFQciLU5QmKfD1k4SeVF,QmPEgBRK6wGhCkKPwAw9j2Na86cp77fmjtMVfT5V4VYWpQ,QmWuHooTjwnDZw4CS58bUWwoSUP9PMjp3vxN3Rmkc3JDU2,QmWhZ9rYPU7S5hkGv4gXQuqMu85Z87oWK1f3hCFK2T9fbD,QmSmxeYAQsHeV5cY75ijruASZ4HpG64SskdTLVYUzBmJUm,Qmbje3tHZNXnCYz3mfzFxQ2ZzpXNYtwWRCoviLC29euWud,QmR7VG4etp7ueP1yoFw7uaZGCLckcf4qhkbTaTK5C8Wd2E,QmPRDQX7GekyKsispCZKJ4cRLxwhVBN3TbWEAqMLPZvqec,QmRwUvuDja6Ss2NNKUnBqsJhHaDMNyW6FdzzSVG77ACcaz,QmcTZRpjWd9b4FkPSR5bGwx3r5cko9jqks5H5b81rjCjLp,QmV3Pbskd7D4DPmseyojXo4E8uzm6rbiPASh6b2TpU38n4,QmWYFJDqDuDrKikgAJj45Mr5gQ37dPywK6D5giFerT3oVG,QmavyWUXwnpvgMHad2pXkALe1WHq9pJatFkqW67p7Nv5Jm,QmSwu6wHHHu8DYXZB9HXRpc2mnrAUYFQbbLHmzMgxxEKZq,QmQJitWq2HjuBsrfm5W4zzsAowe5agM2pbeDg5a43Fh2cv,QmPCGrxrJ77VRzCMpmgFszFx9Ky2FXhHrNKtv8kfBA276Y,QmeenofHLBmbPDvh6bf9pDwXXtuerGunDLYRjpurmV3qt2,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,QmXpXZWi7PQdZuYg1aBr8oDbgaVmSXY2D1rRDnjQ8Ax5zK,Qmc3DYKkQX9tXfy4c5qzc6KKKSUYu1iEwZRNkZpgXRNTsR,QmVQ1VjppWsuspouBKNB73Wk1K1U273zVAwJPuW8aEKK9N,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,Qmb3ZVTSX4bHR7WaRVeupnnnZ9wvov9HHA4zdpZVL8hcyi,QmUm6BeTkSu8brGG1ZwXENBuUihPGLX79whA9t1ZrKhjkQ,QmPcfHotn4MCtuMk5HnPSTEr2jjaonoGUZBNM9zs8Y9X9S,QmPCTkdEAsALUYQcdbmpbZrgCSMfgX9x7UsVFqtGCEn7JN,QmdUwtdf3UwZhPcWi1Qw1DPoANdPcdPZQSz95tpc8sSX5w";
-    //"Genesis,The Judge of Cogito,Jqzl wn Xzwuqam,The Amalgam,The Devourer of Worlds";
     uint256 internal constant bloodlinesLength = 32;
 
     string internal constant eyes =
@@ -46,16 +47,14 @@ library Components {
         "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
     uint256 internal constant namesLength = 186;
 
-    function random(string memory input) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(input)));
-    }
+    // ===== Components ====
 
     function creatureComponents(uint256 tokenId)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "CREATURE", creatures, creaturesLength, true);
+        return pluck(tokenId, "CREATURE", creaturesLength);
     }
 
     function flawComponents(uint256 tokenId)
@@ -63,7 +62,7 @@ library Components {
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "FLAW", flaws, flawsLength, true);
+        return pluck(tokenId, "FLAW", flawsLength);
     }
 
     function originComponents(uint256 tokenId, bool shadowChain)
@@ -71,16 +70,8 @@ library Components {
         pure
         returns (uint256[5] memory)
     {
-        if (shadowChain)
-            return
-                pluck(
-                    tokenId,
-                    "ORIGIN",
-                    "Shadowchain,Shadowchain,Shadowchain,ShadowChain",
-                    5,
-                    false
-                );
-        return pluck(tokenId, "ORIGIN", origins, originsLength, false);
+        if (shadowChain) return pluck(tokenId, "ORIGIN", 5);
+        return pluck(tokenId, "ORIGIN", originsLength);
     }
 
     function bloodlineComponents(uint256 tokenId)
@@ -88,7 +79,7 @@ library Components {
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "BLOODLINE", bloodlines, bloodlinesLength, true);
+        return pluck(tokenId, "BLOODLINE", bloodlinesLength);
     }
 
     function eyeComponents(uint256 tokenId)
@@ -96,7 +87,7 @@ library Components {
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "EYES", eyes, eyesLength, true);
+        return pluck(tokenId, "EYES", eyesLength);
     }
 
     function nameComponents(uint256 tokenId)
@@ -104,19 +95,19 @@ library Components {
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "NAME", names, namesLength, true);
+        return pluck(tokenId, "NAME", namesLength);
     }
+
+    // ===== Pluck Index Numbers of Raw Materials =====
 
     function pluck(
         uint256 tokenId,
         string memory keyPrefix,
-        string memory sourceCSV,
-        uint256 sourceCSVLength,
-        bool rareTrait
+        uint256 sourceCSVLength
     ) internal pure returns (uint256[5] memory) {
         uint256[5] memory components;
 
-        uint256 rand = random(
+        uint256 rand = Random.random(
             string(abi.encodePacked(keyPrefix, toString(tokenId)))
         );
 
@@ -141,17 +132,7 @@ library Components {
         return components;
     }
 
-    function shouldGib(uint256 tokenId, string memory keyPrefix)
-        internal
-        pure
-        returns (bool)
-    {
-        uint256 rand = random(
-            string(abi.encodePacked("SHOULD_GIB", keyPrefix, toString(tokenId)))
-        );
-        uint256 greatness = rand % 21;
-        return (greatness >= 19);
-    }
+    // ===== Get Item from Components =====
 
     function getItemFromCSV(string memory str, uint256 index)
         internal
@@ -167,6 +148,8 @@ library Components {
         }
         return item.toString();
     }
+
+    // ===== Get Item from Affixes ====
 
     function getNamePrefixes(uint256 index)
         internal

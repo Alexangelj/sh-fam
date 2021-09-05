@@ -35,8 +35,8 @@ contract ShadowlingMetadata {
 
     /// @notice Returns an SVG for the provided token id
     function tokenURI(uint256 tokenId) public view returns (string memory) {
-        Attributes.ItemProperties memory props = properties(tokenId);
-        string memory stats = Stats.getStats(Stats.statsOf(tokenId));
+        Attributes.ItemStrings memory props = properties(tokenId);
+        string memory stats = Stats.getStats(tokenId);
         string memory json = Base64.encode(
             bytes(
                 string(
@@ -46,7 +46,7 @@ contract ShadowlingMetadata {
                         '", ',
                         '"description" : ',
                         '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        Attributes.getImage(props, stats),
+                        Attributes.render(props, stats),
                         Attributes.attributes(props)
                     )
                 )
@@ -65,10 +65,21 @@ contract ShadowlingMetadata {
         return Attributes.attributes(properties(tokenId));
     }
 
+    /// @notice Returns the attributes properties of a single item
+    /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
+    /// @param  itemId A value in propertiesOf[tokenId]
+    function attributesItem(uint256 itemId)
+        public
+        view
+        returns (string memory)
+    {
+        return Scanner.attributes(itemId);
+    }
+
     function properties(uint256 tokenId)
         public
         view
-        returns (Attributes.ItemProperties memory)
+        returns (Attributes.ItemStrings memory)
     {
         return Attributes.props(propertiesOf[tokenId]);
     }

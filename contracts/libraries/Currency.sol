@@ -1,5 +1,7 @@
 pragma solidity 0.8.6;
 
+import "./Random.sol";
+
 library Currency {
     uint256 internal constant MOD_FOUR = 2;
     uint256 internal constant MOD_TWO = 3;
@@ -11,6 +13,9 @@ library Currency {
     uint256 internal constant MEM_COPY = 9;
     uint256 internal constant START_INDEX = 10;
 
+    error ModifyError();
+
+    /// @return Count of attribute Ids > 0
     function amountOf(uint256[4] memory params) internal returns (uint256) {
         uint256 len = params.length;
         uint256 count;
@@ -21,17 +26,11 @@ library Currency {
         return count;
     }
 
-    error ModifyError();
-
-    function random(string memory input) internal returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(input)));
-    }
-
     function slot(string memory prefix, uint256 seed)
         internal
         returns (uint256)
     {
-        return random(string(abi.encodePacked(prefix, seed))) % 10000;
+        return Random.slot(prefix, seed, 10000);
     }
 
     /// @notice Modifies an array of values which are the tokenIds for the attributes
