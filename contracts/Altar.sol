@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -95,7 +95,7 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         onlyWhitelisted(token)
     {
         address caller = _msgSender();
-        uint256 value = value(token, id);
+        uint256 value = totalCost(token, id);
         IERC721(token).safeTransferFrom(
             caller,
             address(this),
@@ -118,7 +118,7 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
     ) external nonReentrant onlyWhitelisted(token) {
         if (amount == 0) revert ZeroError();
         address caller = _msgSender();
-        uint256 value = value(token, id);
+        uint256 value = totalCost(token, id);
         IERC1155(token).safeTransferFrom(
             caller,
             address(this),
@@ -132,7 +132,11 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
     }
 
     /// @return Amount of VOID minted from sacrificing `token` with `id
-    function value(address token, uint256 id) public view returns (uint256) {
+    function totalCost(address token, uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         return cost[token] + premium[token][id];
     }
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
@@ -22,7 +22,7 @@ contract Void is ERC20Votes, Ownable, ReentrancyGuard {
 
     constructor(address altar_)
         ERC20Permit("Void Token")
-        ERC20("VOID", "Void Token")
+        ERC20("Void Token", "VOID")
     {
         altar = altar_;
         transferOwnership(altar_);

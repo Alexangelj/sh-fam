@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.6;
 
 /// @notice Formats, parses, and generates the DNA of our shadowy friends
@@ -9,7 +10,7 @@ library Random {
     uint256 private constant T = 3;
 
     /// @notice Builds a sequence from a seed
-    function sequence(uint256 seed) internal returns (string memory) {
+    function sequence(uint256 seed) internal pure returns (string memory) {
         uint256[9] memory values;
 
         values[0] = seed % 100 > 50 ? G : A;
@@ -22,7 +23,7 @@ library Random {
         values[7] = (values[2] == G) ? T : G;
         values[8] = (values[3] == G) ? A : G;
 
-        string memory sequence = string(
+        string memory seq = string(
             abi.encodePacked(
                 values[0],
                 values[1],
@@ -35,7 +36,7 @@ library Random {
                 values[8]
             )
         );
-        return sequence;
+        return seq;
     }
 
     function getSeed(uint256 tokenId) internal view returns (uint256) {

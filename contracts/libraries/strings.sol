@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
  * @title String & slice utility library for Solidity contracts.
  * @author Nick Johnson <arachnid@notdot.net>

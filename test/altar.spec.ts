@@ -39,7 +39,9 @@ describe("Altar", function () {
         .withArgs(owner, nft.address, 1, 0)
 
       expect((await altar.cost(nft.address)).toString()).to.be.eq("1")
-      expect((await altar.value(nft.address, tokenId)).toString()).to.be.eq("1")
+      expect((await altar.totalCost(nft.address, tokenId)).toString()).to.be.eq(
+        "1"
+      )
     })
 
     it("should register with premium", async function () {
@@ -48,7 +50,9 @@ describe("Altar", function () {
         .withArgs(owner, nft.address, 1, 1)
 
       expect((await altar.premium(nft.address)).toString()).to.be.eq("1")
-      expect((await altar.value(nft.address, tokenId)).toString()).to.be.eq("2")
+      expect((await altar.totalCost(nft.address, tokenId)).toString()).to.be.eq(
+        "2"
+      )
     })
 
     it("721#should register then sacrifice", async function () {
@@ -155,7 +159,7 @@ describe("Altar", function () {
     it("1155#take", async function () {
       let amount = 4
       for (let i = 0; i < amount + 1; i++) {
-        await altar.mint()
+        await mixed.mint()
       }
       await altar.sacrifice(mixed.address, tokenId, amount)
       await expect(altar.take(nft.address, tokenId, amount))

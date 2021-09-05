@@ -5,21 +5,16 @@ import "./Attributes.sol";
 import "./Stats.sol";
 import "../TokenId.sol";
 import { Base64, toString } from "../MetadataUtils.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /// @title Helper contract for generating ERC-1155 token ids and descriptions for
 /// the individual items inside a Loot bag.
 /// @author Georgios Konstantopoulos
 /// @dev Inherit from this contract and use it to generate metadata for your tokens
-contract ShadowlingMetadata {
+contract ShadowlingMetadata is ERC721Enumerable {
     mapping(uint256 => Attributes.ItemIds) public propertiesOf;
 
-    function name() external pure returns (string memory) {
-        return "Shadowling";
-    }
-
-    function symbol() external pure returns (string memory) {
-        return "SHDW";
-    }
+    constructor() ERC721("Shadowling", "SHDW") {}
 
     /// @dev Opensea contract metadata: https://docs.opensea.io/docs/contract-level-metadata
     function contractURI() external pure returns (string memory) {
@@ -34,7 +29,12 @@ contract ShadowlingMetadata {
     }
 
     /// @notice Returns an SVG for the provided token id
-    function tokenURI(uint256 tokenId) public view returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721)
+        returns (string memory)
+    {
         Attributes.ItemStrings memory props = properties(tokenId);
         string memory stats = Stats.render(tokenId);
         string memory json = Base64.encode(
@@ -70,7 +70,7 @@ contract ShadowlingMetadata {
     /// @param  itemId A value in propertiesOf[tokenId]
     function attributesItem(uint256 itemId)
         public
-        view
+        pure
         returns (string memory)
     {
         return Scanner.attributes(itemId);

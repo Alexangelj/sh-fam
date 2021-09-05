@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.6;
 
 import "./Random.sol";
@@ -16,7 +17,11 @@ library Currency {
     error ModifyError();
 
     /// @return Count of attribute Ids > 0
-    function amountOf(uint256[4] memory params) internal returns (uint256) {
+    function amountOf(uint256[4] memory params)
+        internal
+        pure
+        returns (uint256)
+    {
         uint256 len = params.length;
         uint256 count;
         for (uint256 i; i < len; i++) {
@@ -28,6 +33,7 @@ library Currency {
 
     function slot(string memory prefix, uint256 seed)
         internal
+        pure
         returns (uint256)
     {
         return Random.slot(prefix, seed, 10000);

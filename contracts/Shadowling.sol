@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./libraries/metadata/ShadowlingMetadata.sol";
 import "./libraries/Random.sol";
 import "./libraries/MetadataUtils.sol";
@@ -12,18 +14,17 @@ import "./Shadowpakt.sol";
 
 import "hardhat/console.sol";
 
-contract Shadowling is
-    Shadowpakt,
-    ShadowlingMetadata,
-    ERC1155,
-    ReentrancyGuard
-{
-    constructor() ERC1155("") {}
-
+contract Shadowling is Shadowpakt, ShadowlingMetadata, ReentrancyGuard {
+    using SafeERC20 for IERC20;
     error CurrencyError();
     error TokenError();
 
-    uint256[] public minted;
+    event SetCost(uint256 indexed currencyId, uint256 indexed cost);
+
+    /// @return Address of the void token contract
+    address public void;
+    /// @notice Maps currencyIds to their respective Void token cost
+    mapping(uint256 => uint256) public costOf;
 
     modifier onlyShadows(uint256 tokenId) {
         if (tokenId < Currency.START_INDEX || tokenId < 1) revert TokenError();
@@ -36,21 +37,13 @@ contract Shadowling is
         _;
     }
 
-    function mint(uint256 tokenId, uint256 amount)
-        external
-        nonReentrant
-        onlyCurrency(tokenId)
-    {
-        _mint(_msgSender(), tokenId, amount, new bytes(0));
-    }
-
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
+    /// @param  tokenId Token with `id` to mint. Maps id to individual item ids in ItemIds
     function claim(uint256 tokenId) external nonReentrant onlyShadows(tokenId) {
         Attributes.ItemIds memory state = Attributes.ids(tokenId);
 
         propertiesOf[tokenId] = state;
-        minted.push(tokenId);
-        _mint(_msgSender(), tokenId, 1, new bytes(0));
+        _safeMint(_msgSender(), tokenId);
     }
 
     /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
@@ -63,8 +56,7 @@ contract Shadowling is
         state.origin = Attributes.originId(tokenId, true);
 
         propertiesOf[tokenId] = state;
-        minted.push(tokenId);
-        _mint(_msgSender(), tokenId, 1, new bytes(0));
+        _safeMint(_msgSender(), tokenId);
     }
 
     function modify(uint256 tokenId, uint256 currencyId)
@@ -73,7 +65,8 @@ contract Shadowling is
         onlyShadows(tokenId)
         onlyCurrency(currencyId)
     {
-        _burn(_msgSender(), currencyId, 1); // send the currency back to the shadowchain
+        burnCurrency(currencyId); // send the currency back to the shadowchain
+
         Attributes.ItemIds memory cache = propertiesOf[tokenId]; // cache the shadowling props
 
         string memory bloodline = Attributes.encodedIdToString(cache.bloodline);
@@ -103,4 +96,20 @@ contract Shadowling is
 
         propertiesOf[tokenId] = cache;
     }
+
+    function burnCurrency(uint256 currencyId) private {
+        uint256 cost = costOf[currencyId];
+        IERC20(void).safeTransferFrom(_msgSender(), address(this), cost);
+    }
+
+    function setCost(uint256 currencyId, uint256 newCost)
+        external
+        onlyOwner
+        onlyCurrency(currencyId)
+    {
+        costOf[currencyId] = newCost;
+        emit SetCost(currencyId, newCost);
+    }
+
+    constructor() {}
 }
