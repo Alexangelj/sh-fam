@@ -27,6 +27,13 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         uint256 extra
     );
 
+    /// @notice Emitted on deletion of entry
+    event Deregistered(
+        address indexed from,
+        address indexed token,
+        uint256 indexed id
+    );
+
     /// @notice Emitted on sacrifice and minting of VOID
     event Sacrificed(
         address indexed from,
@@ -69,6 +76,15 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         emit Registered(msg.sender, token, base, extra);
     }
 
+    /// @notice Update an `address` to be whitelisted or not
+    /// @param  token Address to update the cost value of
+    /// @param  id  Specific tokenId to deregister
+    function deregister(address token, uint256 id) external onlyOwner {
+        delete cost[token];
+        delete premium[token][id];
+        emit Deregistered(msg.sender, token, id);
+    }
+
     /// @notice Sacrifices `token` with `id` to the Shadowpakt, and receives VOID
     /// @dev    Sacrifice function for ERC721, must be approved beforehand
     /// @param  token Asset to sacrifice
@@ -79,7 +95,7 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         onlyWhitelisted(token)
     {
         address caller = _msgSender();
-        uint256 value = valueOf(token, id);
+        uint256 value = value(token, id);
         IERC721(token).safeTransferFrom(
             caller,
             address(this),
@@ -102,7 +118,7 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
     ) external nonReentrant onlyWhitelisted(token) {
         if (amount == 0) revert ZeroError();
         address caller = _msgSender();
-        uint256 value = valueOf(token, id);
+        uint256 value = value(token, id);
         IERC1155(token).safeTransferFrom(
             caller,
             address(this),
@@ -116,7 +132,7 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
     }
 
     /// @return Amount of VOID minted from sacrificing `token` with `id
-    function valueOf(address token, uint256 id) public view returns (uint256) {
+    function value(address token, uint256 id) public view returns (uint256) {
         return cost[token] + premium[token][id];
     }
 
