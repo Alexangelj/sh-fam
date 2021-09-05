@@ -8,10 +8,16 @@ import "./libraries/metadata/ShadowlingMetadata.sol";
 import "./libraries/Random.sol";
 import "./libraries/MetadataUtils.sol";
 import "./libraries/Currency.sol";
+import "./Shadowpakt.sol";
 
 import "hardhat/console.sol";
 
-contract Shadowling is ShadowlingMetadata, ERC1155, ReentrancyGuard {
+contract Shadowling is
+    Shadowpakt,
+    ShadowlingMetadata,
+    ERC1155,
+    ReentrancyGuard
+{
     constructor() ERC1155("") {}
 
     error CurrencyError();

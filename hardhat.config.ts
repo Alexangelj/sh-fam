@@ -1,19 +1,15 @@
-import { task } from "hardhat/config"
+import "hardhat-deploy"
 import "@nomiclabs/hardhat-waffle"
+import "@nomiclabs/hardhat-ethers"
+import { HardhatUserConfig } from "hardhat/config"
 
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (args, hre) => {
-  const accounts = await hre.ethers.getSigners()
-
-  for (const account of accounts) {
-    console.log(await account.address)
-  }
-})
+import "./scripts/generateKeys"
+import "./scripts/dropKeys"
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
-export default {
+const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
@@ -39,4 +35,11 @@ export default {
   mocha: {
     timeout: 1000000,
   },
+  namedAccounts: {
+    deployer: {
+      default: "",
+    },
+  },
 }
+
+export default config
