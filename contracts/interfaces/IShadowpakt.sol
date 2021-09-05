@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 /// @author Clement Lakhal
-interface IWhitelist {
+interface IShadowpakt {
     /// EVENTS ///
 
     /// @notice Emitted when a user is whitelisted

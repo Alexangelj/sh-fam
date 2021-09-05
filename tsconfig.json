@@ -4,8 +4,22 @@
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist"
+    "resolveJsonModule": true,
+    "preserveSymlinks": true,
+    "outDir": "dist",
+    "types": ["@nomiclabs/hardhat-ethers", "@nomiclabs/hardhat-waffle"],
+    "noImplicitAny": false
   },
-  "include": ["./scripts", "./test", "./contracts", "./deploy"],
-  "files": ["./hardhat.config.ts"]
+  "exclude": ["node_modules"],
+  "include": [
+    "artifacts/**/*",
+    "artifacts/**/*.json",
+    "scripts/**/*",
+    "test/",
+    "hardhat.config.ts"
+  ],
+  "files": ["./hardhat.config.ts"],
+  "ts-node": {
+    "files": true
+  }
 }

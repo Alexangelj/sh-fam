@@ -1,8 +1,9 @@
+import path from "path"
 import "hardhat-deploy"
+import "hardhat-contract-sizer"
 import "@nomiclabs/hardhat-waffle"
 import "@nomiclabs/hardhat-ethers"
 import { HardhatUserConfig } from "hardhat/config"
-
 import "./scripts/generateKeys"
 import "./scripts/dropKeys"
 
@@ -17,7 +18,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 100,
           },
         },
       },
@@ -26,11 +27,15 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 100,
           },
         },
       },
     ],
+  },
+  paths: {
+    artifacts: path.join(__dirname, "artifacts"),
+    tests: path.join(__dirname, "test"),
   },
   mocha: {
     timeout: 1000000,

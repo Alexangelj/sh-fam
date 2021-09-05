@@ -8,89 +8,55 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IVoid.sol";
+import "./interfaces/IAltar.sol";
+import "./interfaces/IShadowling.sol";
+import "./libraries/Currency.sol";
 
 /// @notice Mints VOID in exchange for whitelisted NFTs
-contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
-    /// @notice Cost of the NFT with `address`, denominated in VOID tokens
-    mapping(address => uint256) public cost;
-    /// @notice Additional premium cost of an NFT with `id`, denominated in VOID tokens
-    mapping(address => mapping(uint256 => uint256)) public premium;
-    /// @notice Void Token to mint
-    address public void;
+contract Altar is
+    IAltar,
+    Ownable,
+    ReentrancyGuard,
+    IERC1155Receiver,
+    IERC721Receiver
+{
+    using SafeERC20 for IERC20;
 
-    /// @notice Emitted on upating the `cost` mapping
-    event Registered(
-        address indexed from,
-        address indexed token,
-        uint256 indexed base,
-        uint256 extra
-    );
-
-    /// @notice Emitted on deletion of entry
-    event Deregistered(
-        address indexed from,
-        address indexed token,
-        uint256 indexed id
-    );
-
-    /// @notice Emitted on sacrifice and minting of VOID
-    event Sacrificed(
-        address indexed from,
-        address indexed token,
-        uint256 indexed id,
-        uint256 value
-    );
-
-    /// @notice Emitted when an owner removes tokens
-    event Taken(
-        address indexed from,
-        address indexed token,
-        uint256 indexed id,
-        uint256 amount
-    );
-
-    /// @notice Thrown on attempting to burn a non-whitelisted asset
-    error RegisteredError();
-    /// @notice Thrown on passing a zero value as a parameter, you're welcome
-    error ZeroError();
+    /// @inheritdoc IAltar
+    address public override void;
+    /// @inheritdoc IAltar
+    address public override shadowling;
+    /// @inheritdoc IAltar
+    mapping(uint256 => uint256) public override currencyCost;
+    /// @inheritdoc IAltar
+    mapping(address => uint256) public override cost;
+    /// @inheritdoc IAltar
+    mapping(address => mapping(uint256 => uint256)) public override premium;
 
     modifier onlyWhitelisted(address token) {
-        if (cost[token] == 0) revert RegisteredError();
+        if (cost[token] == 0) revert ListedError();
         _;
     }
 
-    /// @notice Update an `address` to be whitelisted or not
-    /// @param  token Address to update the cost value of
-    /// @param  base Amount of VOID minted per `token` burned
-    /// @param  extra Amount of VOID minted in addition to the base cost, for `token` with `id
-    function register(
-        address token,
-        uint256 id,
-        uint256 base,
-        uint256 extra
-    ) external onlyOwner {
-        if (base == 0) revert ZeroError();
-        cost[token] = base;
-        if (extra > 0) premium[token][id] = extra;
-        emit Registered(msg.sender, token, base, extra);
+    modifier onlyShadows(uint256 tokenId) {
+        if (tokenId < Currency.START_INDEX || tokenId < 1) revert TokenError();
+        _;
     }
 
-    /// @notice Update an `address` to be whitelisted or not
-    /// @param  token Address to update the cost value of
-    /// @param  id  Specific tokenId to deregister
-    function deregister(address token, uint256 id) external onlyOwner {
-        delete cost[token];
-        delete premium[token][id];
-        emit Deregistered(msg.sender, token, id);
+    modifier onlyCurrency(uint256 tokenId) {
+        if (tokenId > Currency.START_INDEX - 1 || tokenId < 1)
+            revert CurrencyError();
+        _;
     }
 
-    /// @notice Sacrifices `token` with `id` to the Shadowpakt, and receives VOID
-    /// @dev    Sacrifice function for ERC721, must be approved beforehand
-    /// @param  token Asset to sacrifice
-    /// @param  id    Specific asset to sacrifice
-    function sacrifice(address token, uint256 id)
+    // ===== User Actions =====
+
+    /// @inheritdoc IAltar
+    function offering(address token, uint256 id)
         external
+        override
         nonReentrant
         onlyWhitelisted(token)
     {
@@ -107,15 +73,12 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         emit Sacrificed(msg.sender, token, id, value);
     }
 
-    /// @notice Sacrifices `amount` of `token` with `id` to the Shadowpakt, and receives VOID
-    /// @dev    Sacrifice function for ERC1155
-    /// @param  token Asset to sacrifice
-    /// @param  id    Specific asset to sacrifice
-    function sacrifice(
+    /// @inheritdoc IAltar
+    function sacrificeMany(
         address token,
         uint256 id,
         uint256 amount
-    ) external nonReentrant onlyWhitelisted(token) {
+    ) external override nonReentrant onlyWhitelisted(token) {
         if (amount == 0) revert ZeroError();
         address caller = _msgSender();
         uint256 value = totalCost(token, id);
@@ -131,21 +94,95 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         emit Sacrificed(msg.sender, token, id, value);
     }
 
-    /// @return Amount of VOID minted from sacrificing `token` with `id
-    function totalCost(address token, uint256 id)
-        public
-        view
-        returns (uint256)
+    /// @notice Mints a shadowling
+    function claim(uint256 tokenId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
     {
-        return cost[token] + premium[token][id];
+        return IShadowling(shadowling).claim(tokenId, _msgSender());
     }
 
-    /// @notice Owner function to pull ERC1155 tokens from this contract for nefarious purposes
-    function take(
+    /// @notice Summons a shadowling from the shadowchain
+    function summon(uint256 tokenId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
+    {
+        return IShadowling(shadowling).summon(tokenId, _msgSender());
+    }
+
+    /// @notice Modifies a shadowling's attributes
+    function modify(uint256 tokenId, uint256 currencyId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
+    {
+        burn(currencyId); // send the currency back to the shadowchain
+        return IShadowling(shadowling).modify(tokenId, currencyId);
+    }
+
+    function burn(uint256 currencyId) private {
+        uint256 value = currencyCost[currencyId];
+        if (value == 0) revert CurrencyError();
+        IVoid(void).burn(_msgSender(), value);
+    }
+
+    // ===== Owner Actions =====
+
+    /// @inheritdoc IAltar
+    function list(
+        address token,
+        uint256 id,
+        uint256 base,
+        uint256 extra
+    ) external override onlyOwner {
+        if (base == 0) revert ZeroError();
+        cost[token] = base;
+        if (extra > 0) premium[token][id] = extra;
+        emit Listed(msg.sender, token, base, extra);
+    }
+
+    /// @inheritdoc IAltar
+    function delist(address token, uint256 id) external override onlyOwner {
+        delete cost[token];
+        delete premium[token][id];
+        emit Delisted(msg.sender, token, id);
+    }
+
+    /// @inheritdoc IAltar
+    function setVoid(address void_) external override onlyOwner {
+        if (void != address(0)) revert InitializedError();
+        if (IVoid(void_).owner() == address(this)) void = void_;
+    }
+
+    /// @inheritdoc IAltar
+    function setShadowling(address shadowling_) external override onlyOwner {
+        if (shadowling != address(0)) revert InitializedError();
+        if (IVoid(shadowling_).owner() == address(this))
+            shadowling = shadowling_;
+    }
+
+    /// @inheritdoc IAltar
+    function setCurrencyCost(uint256 currencyId, uint256 newCost)
+        external
+        override
+        onlyOwner
+        onlyCurrency(currencyId)
+    {
+        currencyCost[currencyId] = newCost;
+        emit SetCurrencyCost(currencyId, newCost);
+    }
+
+    /// @inheritdoc IAltar
+    function takeMany(
         address token,
         uint256 id,
         uint256 amount
-    ) external onlyOwner nonReentrant {
+    ) external override onlyOwner nonReentrant {
         if (amount == 0) revert ZeroError();
         IERC1155(token).safeTransferFrom(
             address(this),
@@ -157,11 +194,18 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         emit Taken(msg.sender, token, id, amount);
     }
 
-    /// @notice Owner function to pull ERC721 tokens from this contract for nefarious purposes
-    function take(address token, uint256 id) external onlyOwner nonReentrant {
+    /// @inheritdoc IAltar
+    function takeSingle(address token, uint256 id)
+        external
+        override
+        onlyOwner
+        nonReentrant
+    {
         IERC721(token).safeTransferFrom(address(this), owner(), id);
         emit Taken(msg.sender, token, id, 1);
     }
+
+    // ===== Callbacks =====
 
     function onERC721Received(
         address,
@@ -215,6 +259,18 @@ contract Altar is Ownable, ReentrancyGuard, IERC1155Receiver, IERC721Receiver {
         return
             interfaceId == type(IERC721).interfaceId ||
             interfaceId == type(IERC1155).interfaceId;
+    }
+
+    // ===== View =====
+
+    /// @inheritdoc IAltar
+    function totalCost(address token, uint256 id)
+        public
+        view
+        override
+        returns (uint256)
+    {
+        return cost[token] + premium[token][id];
     }
 
     constructor() {}

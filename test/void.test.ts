@@ -42,6 +42,7 @@ describe("Void", function () {
     })
 
     it("should burn from owners call", async function () {
+      await expect(token.mint(altar.address, 1)).to.not.be.reverted
       await expect(token.burn(altar.address, 1)).to.not.be.reverted
     })
   })
