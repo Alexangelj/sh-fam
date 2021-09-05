@@ -36,7 +36,7 @@ contract ShadowlingMetadata {
     /// @notice Returns an SVG for the provided token id
     function tokenURI(uint256 tokenId) public view returns (string memory) {
         Attributes.ItemStrings memory props = properties(tokenId);
-        string memory stats = Stats.getStats(tokenId);
+        string memory stats = Stats.render(tokenId);
         string memory json = Base64.encode(
             bytes(
                 string(

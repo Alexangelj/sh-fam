@@ -41,13 +41,15 @@ library Attributes {
 
     // ===== Encoding Ids =====
 
-    /// @notice Given an ERC1155 token id, returns its name by decoding and parsing the id
-    function encodedIdToString(uint256 id)
+    /// @notice Given an item id, returns its name by decoding and parsing the id
+    function encodedIdToString(uint256 itemId)
         internal
         pure
         returns (string memory)
     {
-        (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
+        (uint256[5] memory components, uint256 itemType) = TokenId.fromId(
+            itemId
+        );
         return Scanner.componentsToString(components, itemType);
     }
 
@@ -184,7 +186,7 @@ library Attributes {
         return output;
     }
 
-    // ===== Encode NFT tokenId to Ids of Each Item =====
+    // ===== Encode Individual Item Ids =====
 
     // View helpers for getting the item ID that corresponds to a bag's items
     function creatureId(uint256 tokenId) internal pure returns (uint256) {

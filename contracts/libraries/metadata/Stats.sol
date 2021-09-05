@@ -8,7 +8,7 @@ import { Base64, toString } from "../MetadataUtils.sol";
 library Stats {
     // ===== Stats in SVG =====
 
-    function getStats(uint256 tokenId) internal pure returns (string memory) {
+    function render(uint256 tokenId) internal pure returns (string memory) {
         string[11] memory stats;
 
         stats[0] = strStat(tokenId);
