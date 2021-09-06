@@ -8,7 +8,7 @@ async function main() {
   const accounts = await ethers.getSigners()
 
   //let epithets = xmons.xmons.map((xmon: any) => xmon.Epithets)
-  let epithets = xmons.xmons.map((xmon: any) => xmon.InputHash)
+  let epithets = xmons.xmons.map((xmon: any) => xmon.Name)
   function callbk(prev: any, curr: any, index: any) {
     if (index > 32) return prev
     return prev + "," + curr
