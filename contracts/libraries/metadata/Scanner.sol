@@ -18,11 +18,11 @@ library Scanner {
     uint256 internal constant FLAW = 0x1;
     uint256 internal constant ORIGIN = 0x2;
     uint256 internal constant BLOODLINE = 0x3;
-    uint256 internal constant EYES = 0x4;
+    uint256 internal constant ABILITY = 0x4;
     uint256 internal constant NAME = 0x5;
 
     string internal constant itemTypes =
-        "Creature,Flaw,Origin,Bloodline,Eyes,Name";
+        "Creature,Flaw,Origin,Bloodline,Ability,Name";
 
     // ====== Item Slot Fetcher =====
 
@@ -92,8 +92,8 @@ library Scanner {
             arr = Components.origins;
         } else if (itemType == BLOODLINE) {
             arr = Components.bloodlines;
-        } else if (itemType == EYES) {
-            arr = Components.eyes;
+        } else if (itemType == ABILITY) {
+            arr = Components.abilities;
         } else if (itemType == NAME) {
             arr = Components.names;
         } else {

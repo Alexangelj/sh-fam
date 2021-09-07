@@ -105,6 +105,7 @@ contract Altar is
         if (amount == 0) revert ZeroError();
         address caller = _msgSender();
         uint256 value = totalCost(token, tokenId);
+        if (amount > 1) value = (amount * value) / 1e18; // void token is 18 decimals
 
         if (forShadowling) {
             IShadowling(shadowling).claim(tokenId, caller);

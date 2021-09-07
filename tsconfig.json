@@ -17,7 +17,9 @@
     "scripts/**/*",
     "test/",
     "hardhat.config.ts",
-    "./deploy"
+    "./deploy",
+    "tasks/claim.ts",
+    "tasks/dropKeys.ts"
   ],
   "files": ["./hardhat.config.ts"],
   "ts-node": {

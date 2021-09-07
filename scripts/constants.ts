@@ -38,12 +38,12 @@ export const SHADOWLING_COST = parseEther("100")
  * @notice Mapping of nft addresses to base costs
  */
 export const BASE_COSTS: { [token: string]: BigNumber } = {
-  [""]: parseEther("100"),
+  ["0xA7206d878c5c3871826DfdB42191c49B1D11F466"]: parseEther("100"),
 }
 
 /**
  * @notice Mapping of token addresses with specific ids to premium costs
  */
 export const PREMIUM_COSTS: { [token: string]: { [id: string]: BigNumber } } = {
-  [""]: { [0]: parseEther("100") },
+  ["0xA7206d878c5c3871826DfdB42191c49B1D11F466"]: { [0]: parseEther("1") },
 }

@@ -100,10 +100,10 @@ describe("Shadowling", function () {
       log(json)
     })
 
-    it("should claim 500", async function () {
+    it("should claim 50", async function () {
       let images: string[] = []
       let imageData: any = {}
-      for (let i = 100; i < 50; i++) {
+      for (let i = 100; i < 150; i++) {
         try {
           await altar.claim(i)
         } catch (err) {

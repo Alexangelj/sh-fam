@@ -25,7 +25,7 @@ library Attributes {
         uint256 flaw;
         uint256 origin;
         uint256 bloodline;
-        uint256 eyes;
+        uint256 ability;
         uint256 name;
     }
 
@@ -35,7 +35,7 @@ library Attributes {
         string flaw;
         string origin;
         string bloodline;
-        string eyes;
+        string ability;
         string name;
     }
 
@@ -85,7 +85,7 @@ library Attributes {
 
         parts[8] = '</text><text x="10" y="100" class="base">';
 
-        parts[9] = item.eyes;
+        parts[9] = item.ability;
 
         parts[10] = '</text><text x="10" y="120" class="base">';
 
@@ -168,7 +168,7 @@ library Attributes {
             abi.encodePacked(
                 res,
                 ", ",
-                trait(Scanner.getItemType(4), items.eyes)
+                trait(Scanner.getItemType(4), items.ability)
             )
         );
 
@@ -210,8 +210,8 @@ library Attributes {
         return TokenId.toId(tokenId.bloodlineComponents(), Scanner.BLOODLINE);
     }
 
-    function eyesId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.eyeComponents(), Scanner.EYES);
+    function abilityId(uint256 tokenId) internal pure returns (uint256) {
+        return TokenId.toId(tokenId.abilityComponents(), Scanner.ABILITY);
     }
 
     function nameId(uint256 tokenId) internal pure returns (uint256) {
@@ -229,7 +229,7 @@ library Attributes {
                 flaw: Attributes.flawId(tokenId),
                 origin: Attributes.originId(tokenId, false),
                 bloodline: Attributes.bloodlineId(tokenId),
-                eyes: Attributes.eyesId(tokenId),
+                ability: Attributes.abilityId(tokenId),
                 name: Attributes.nameId(tokenId)
             });
     }
@@ -247,7 +247,7 @@ library Attributes {
                 flaw: encodedIdToString(items.flaw),
                 origin: encodedIdToString(items.origin),
                 bloodline: encodedIdToString(items.bloodline),
-                eyes: encodedIdToString(items.eyes),
+                ability: encodedIdToString(items.ability),
                 name: encodedIdToString(items.name)
             });
     }

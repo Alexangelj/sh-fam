@@ -3,14 +3,54 @@ import "hardhat-deploy"
 import "hardhat-contract-sizer"
 import "@nomiclabs/hardhat-waffle"
 import "@nomiclabs/hardhat-ethers"
+import "@nomiclabs/hardhat-etherscan"
 import { HardhatUserConfig } from "hardhat/config"
-import "./scripts/generateKeys"
-import "./scripts/dropKeys"
+import "./tasks/claim"
+import "./tasks/dropKeys"
+import "./tasks/generateKeys"
+import "./tasks/getShadowling"
+import "./tasks/setBaseCost"
+import "./tasks/setCurrencyCost"
+import "./tasks/setPremiumCost"
+import "./tasks/setShadowlingCost"
+import "./tasks/summon"
+import "./tasks/setup"
+import "./tasks/verifyAll"
+import * as dotenv from "dotenv"
+import { parseUnits } from "@ethersproject/units"
+
+dotenv.config()
+
+const { ETHERSCAN_API_KEY, DEPLOYER_KEY, MAINNET_RPC, KOVAN_RPC, RINKEBY_RPC } =
+  process.env
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
-const config: HardhatUserConfig = {
+const maxFeePerGas = parseUnits("100", "gwei")
+const maxPriorityFeePerGas = parseUnits("20", "gwei")
+
+export default {
+  networks: {
+    hardhat: {},
+    kovan: {
+      accounts: [DEPLOYER_KEY],
+      chainId: 42,
+      url: KOVAN_RPC,
+      maxFeePerGas: maxFeePerGas,
+      maxPriorityFeePerGas: maxPriorityFeePerGas,
+      type: "0x02",
+    },
+
+    rinkeby: {
+      accounts: [DEPLOYER_KEY],
+      chainId: 4,
+      url: RINKEBY_RPC,
+      maxFeePerGas: maxFeePerGas,
+      maxPriorityFeePerGas: maxPriorityFeePerGas,
+      type: "0x02",
+    },
+  },
   solidity: {
     compilers: [
       {
@@ -33,6 +73,11 @@ const config: HardhatUserConfig = {
       },
     ],
   },
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    apiKey: ETHERSCAN_API_KEY,
+  },
   paths: {
     artifacts: path.join(__dirname, "artifacts"),
     tests: path.join(__dirname, "test"),
@@ -42,9 +87,7 @@ const config: HardhatUserConfig = {
   },
   namedAccounts: {
     deployer: {
-      default: "",
+      default: 0, // first account
     },
   },
 }
-
-export default config

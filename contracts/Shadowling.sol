@@ -51,14 +51,14 @@ contract Shadowling is ShadowlingMetadata, Ownable, ReentrancyGuard {
         uint256[4] memory values;
         values[0] = cache.creature;
         values[1] = cache.flaw;
-        values[2] = cache.eyes;
+        values[2] = cache.ability;
         values[3] = cache.name;
 
         values = Currency.modify(currencyId, values, seed);
 
         cache.creature = values[0] > 0 ? Attributes.creatureId(values[0]) : 0;
         cache.flaw = values[1] > 0 ? Attributes.flawId(values[1]) : 0;
-        cache.eyes = values[2] > 0 ? Attributes.eyesId(values[2]) : 0;
+        cache.ability = values[2] > 0 ? Attributes.abilityId(values[2]) : 0;
         cache.name = values[3] > 0 ? Attributes.nameId(values[3]) : 0;
 
         propertiesOf[tokenId] = cache;
