@@ -10,4 +10,8 @@ contract MockERC1155 is ERC1155("") {
         _mint(msg.sender, id, 1, new bytes(0));
         id++;
     }
+
+    function mintId(uint256 tokenId) public {
+        _mint(msg.sender, tokenId, 1, new bytes(0));
+    }
 }

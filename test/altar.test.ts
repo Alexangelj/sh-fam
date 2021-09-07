@@ -16,6 +16,7 @@ describe("Altar", function () {
   let mock721: Contract
   let mock1155: Contract
   let fixture: ShadowFixture
+  let forShadowling: boolean = false
 
   const loadFixture = createFixtureLoader(accounts, waffle.provider)
 
@@ -24,13 +25,18 @@ describe("Altar", function () {
     fixture = await loadFixture(shadowFixture)
     ;({ altar, token, shdw, mock721, mock1155 } = fixture)
     tokenId = 1
+
+    await altar.setBaseCost(mock721.address, 1)
+    await altar.setBaseCost(mock1155.address, 1)
+    await mock721.mintId(tokenId)
+    await mock1155.mintId(tokenId)
   })
 
   describe("altar#list", function () {
     it("should list with no premium", async function () {
-      await expect(altar.list(mock721.address, tokenId, 1, 0))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock721.address, 1, 0)
+      await expect(altar.setBaseCost(mock721.address, 1))
+        .to.emit(altar, "SetBaseCost")
+        .withArgs(owner, mock721.address, 1)
 
       expect((await altar.cost(mock721.address)).toString()).to.be.eq("1")
       expect(
@@ -39,9 +45,13 @@ describe("Altar", function () {
     })
 
     it("should list with premium", async function () {
-      await expect(altar.list(mock721.address, tokenId, 1, 1))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock721.address, 1, 1)
+      await expect(altar.setBaseCost(mock721.address, 1))
+        .to.emit(altar, "SetBaseCost")
+        .withArgs(owner, mock721.address, 1)
+
+      await expect(altar.setPremiumCost(mock721.address, tokenId, 1))
+        .to.emit(altar, "SetPremiumCost")
+        .withArgs(owner, mock721.address, tokenId, 1)
 
       expect(
         (await altar.premium(mock721.address, tokenId)).toString()
@@ -51,44 +61,47 @@ describe("Altar", function () {
       ).to.be.eq("2")
     })
 
-    it("721#should list then do offering", async function () {
-      await expect(altar.list(mock721.address, tokenId, 1, 1))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock721.address, 1, 1)
+    it("should setBaseCost to 0", async function () {
+      await altar.setBaseCost(mock1155.address, 1)
+      await expect(altar.setBaseCost(mock1155.address, 0)).to.emit(
+        altar,
+        "SetBaseCost"
+      )
+    })
+  })
 
+  describe("altar#sacrifice", function () {
+    it("721#should list then do sacrifice", async function () {
       let cost = await altar.totalCost(mock721.address, tokenId)
-      await expect(altar.offering(mock721.address, tokenId))
+      await expect(altar.sacrifice721(mock721.address, tokenId, forShadowling))
         .to.emit(altar, "Sacrificed")
         .withArgs(owner, mock721.address, tokenId, cost.toString())
-
-      expect(
-        (await altar.premium(mock721.address, tokenId)).toString()
-      ).to.be.eq("1")
     })
 
-    it("721#should list then offering and get void", async function () {
-      await expect(altar.list(mock721.address, tokenId, 1, 1))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock721.address, 1, 1)
+    it("altar#forShadowling: should list then sacrifice for shadowling", async function () {
+      await altar.setShadowlingCost(1)
+      await expect(() =>
+        altar.sacrifice721(mock721.address, tokenId, true)
+      ).to.changeTokenBalance(token, accounts[0], "0")
+    })
 
+    it("721#should list then sacrifice and get void", async function () {
       let cost = await altar.totalCost(mock721.address, tokenId)
       await expect(() =>
-        altar.offering(mock721.address, tokenId)
+        altar.sacrifice721(mock721.address, tokenId, forShadowling)
       ).to.changeTokenBalance(token, accounts[0], cost)
-
-      expect(
-        (await altar.premium(mock721.address, tokenId)).toString()
-      ).to.be.eq("1")
     })
 
-    it("1155#should list then offering", async function () {
+    it("1155#should list then sacrifice", async function () {
       let amount = 1
-      await expect(altar.list(mock1155.address, tokenId, 1, 0))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock1155.address, 1, 0)
+      await expect(altar.setBaseCost(mock1155.address, 1))
+        .to.emit(altar, "SetBaseCost")
+        .withArgs(owner, mock1155.address, 1)
 
       let cost = await altar.totalCost(mock1155.address, tokenId)
-      await expect(altar.sacrificeMany(mock1155.address, tokenId, amount))
+      await expect(
+        altar.sacrifice1155(mock1155.address, tokenId, amount, forShadowling)
+      )
         .to.emit(altar, "Sacrificed")
         .withArgs(owner, mock1155.address, tokenId, cost.toString())
 
@@ -97,65 +110,48 @@ describe("Altar", function () {
       ).to.be.eq("0")
     })
 
-    it("1155#should list then offering and get void", async function () {
+    it("1155#should list then sacrifice and get void", async function () {
       let amount = 1
-      await expect(altar.list(mock1155.address, tokenId, 1, 0))
-        .to.emit(altar, "Listed")
-        .withArgs(owner, mock1155.address, 1, 0)
+      await expect(altar.setBaseCost(mock1155.address, 1))
+        .to.emit(altar, "SetBaseCost")
+        .withArgs(owner, mock1155.address, 1)
 
       let cost = await altar.totalCost(mock1155.address, tokenId)
       await expect(() =>
-        altar.sacrificeMany(mock1155.address, tokenId, amount)
+        altar.sacrifice1155(mock1155.address, tokenId, amount, forShadowling)
       ).to.changeTokenBalance(token, accounts[0], cost)
 
       expect(
         (await altar.premium(mock1155.address, tokenId)).toString()
       ).to.be.eq("0")
     })
-
-    it("should delist", async function () {
-      await altar.list(mock1155.address, tokenId, 1, 0)
-      await expect(altar.delist(mock1155.address, tokenId)).to.emit(
-        altar,
-        "Delisted"
-      )
-    })
   })
 
   describe("revert cases", function () {
-    beforeEach(async function () {
-      await altar.list(mock721.address, tokenId, 1, 0)
-      await altar.list(mock1155.address, tokenId, 1, 0)
-    })
-
-    it("list#should revert if base of 0", async function () {
-      await expect(altar.list(mock1155.address, tokenId, 0, 0)).to.be.reverted
-    })
-
     it("721#should revert if not owner", async function () {
-      await altar.offering(mock721.address, tokenId)
+      await altar.sacrifice721(mock721.address, tokenId, forShadowling)
       await expect(
         altar.connect(accounts[1]).takeSingle(mock721.address, tokenId)
       ).to.be.reverted
     })
 
     it("1155#should revert if not owner", async function () {
-      await altar.sacrificeMany(mock1155.address, tokenId, 1)
+      await altar.sacrifice1155(mock1155.address, tokenId, 1, false)
       await expect(
         altar.connect(accounts[1]).takeMany(mock721.address, tokenId, 1)
       ).to.be.reverted
     })
 
-    it("delist#revert if not owner", async function () {
-      await altar.list(mock1155.address, tokenId, 1, 0)
-      await expect(altar.connect(accounts[1]).delist(mock1155.address, tokenId))
+    it("setBaseCost#revert if not owner", async function () {
+      await altar.setBaseCost(mock1155.address, 1)
+      await expect(altar.connect(accounts[1]).setBaseCost(mock1155.address, 0))
         .to.be.reverted
     })
   })
 
   describe("owner actions", function () {
     it("721#take", async function () {
-      await altar.offering(mock721.address, tokenId)
+      await altar.sacrifice721(mock721.address, tokenId, forShadowling)
       await expect(altar.takeSingle(mock721.address, tokenId))
         .to.emit(altar, "Taken")
         .withArgs(owner, mock721.address, tokenId, 1)
@@ -166,8 +162,8 @@ describe("Altar", function () {
       for (let i = 0; i < amount + 1; i++) {
         await mock1155.mint()
       }
-      await altar.list(mock1155.address, 0, 1, 0)
-      await altar.sacrificeMany(mock1155.address, 0, 1)
+      await altar.setBaseCost(mock1155.address, 1)
+      await altar.sacrifice1155(mock1155.address, 0, 1, false)
       await expect(altar.takeMany(mock1155.address, 0, 1))
         .to.emit(altar, "Taken")
         .withArgs(owner, mock1155.address, 0, 1)

@@ -4,26 +4,26 @@ pragma solidity 0.8.6;
 interface IAltar {
     // ===== Events =====
 
-    /// @notice Emitted on upating the `cost` mapping
-    event Listed(
+    /// @notice Emitted on upating the base amount of void received from burning an nft
+    event SetBaseCost(
         address indexed from,
         address indexed token,
-        uint256 indexed base,
-        uint256 extra
+        uint256 indexed base
     );
 
-    /// @notice Emitted on deletion of entry
-    event Delisted(
+    /// @notice Emitted on updating the premium amount of void received from burning an nft
+    event SetPremiumCost(
         address indexed from,
         address indexed token,
-        uint256 indexed id
+        uint256 indexed tokenId,
+        uint256 premium
     );
 
     /// @notice Emitted on sacrifice and minting of VOID
     event Sacrificed(
         address indexed from,
         address indexed token,
-        uint256 indexed id,
+        uint256 indexed tokenId,
         uint256 value
     );
 
@@ -31,9 +31,19 @@ interface IAltar {
     event Taken(
         address indexed from,
         address indexed token,
-        uint256 indexed id,
+        uint256 indexed tokenId,
         uint256 amount
     );
+
+    /// @notice Emitted on modifying a Shadowling's attributes
+    event Modified(
+        address indexed from,
+        uint256 indexed tokenId,
+        uint256 indexed currencyId
+    );
+
+    /// @notice Emitted on burning void tokens to claim a Shadowling
+    event Claimed(address indexed from, uint256 indexed tokenId);
 
     /// @notice Emitted on setting the price of a currency usage in void tokens
     event SetCurrencyCost(uint256 indexed currencyId, uint256 indexed cost);
@@ -59,25 +69,31 @@ interface IAltar {
     /// @notice Shadowling NFT
     function shadowling() external view returns (address);
 
-    /// @notice Maps currencyIds to their respective Void token cost
-    function currencyCost(uint256 currencyId) external view returns (uint256);
+    /// @notice Void burned for conjuring a Shadowling
+    function shadowlingCost() external view returns (uint256);
 
     /// @notice Cost of the NFT with `address`, denominated in VOID tokens
     function cost(address token) external view returns (uint256);
 
-    /// @notice Additional premium cost of an NFT with `id`, denominated in VOID tokens
-    function premium(address token, uint256 id) external view returns (uint256);
+    /// @notice Maps currencyIds to their respective Void token cost
+    function currencyCost(uint256 currencyId) external view returns (uint256);
 
-    /// @return Amount of VOID minted from sacrificing `token` with `id
-    function totalCost(address token, uint256 id)
+    /// @notice Additional premium cost of an NFT with `tokenId`, denominated in VOID tokens
+    function premium(address token, uint256 tokenId)
         external
         view
         returns (uint256);
 
-    // ===== Users =====
+    /// @return Amount of VOID minted from sacrificing `token` with `tokenId
+    function totalCost(address token, uint256 tokenId)
+        external
+        view
+        returns (uint256);
+
+    // ===== User =====
 
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
-    /// @param  tokenId Token with `id` to mint. Maps id to individual item ids in ItemIds
+    /// @param  tokenId Token with `tokenId` to mint. Maps tokenId to individual item ids in ItemIds
     function claim(uint256 tokenId) external;
 
     /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
@@ -86,56 +102,67 @@ interface IAltar {
     /// @notice Modifies a Shadowling using with the `currencyId`, changing its attributes
     function modify(uint256 tokenId, uint256 currencyId) external;
 
-    /// @notice Sacrifices `token` with `id` to the Shadowpakt, and receives VOID
+    /// @notice Sacrifices `token` with `tokenId` to the Shadowpakt, and receives VOID
     /// @dev    Sacrifice function for ERC721, must be approved beforehand
     /// @param  token Asset to sacrifice
-    /// @param  id    Specific asset to sacrifice
-    function offering(address token, uint256 id) external;
-
-    /// @notice Sacrifices `amount` of `token` with `id` to the Shadowpakt, and receives VOID
-    /// @dev    Sacrifice function for ERC1155
-    /// @param  token Asset to sacrifice
-    /// @param  id    Specific asset to sacrifice
-    function sacrificeMany(
+    /// @param  tokenId    Specific asset to sacrifice
+    /// @param  forShadowling If true, mints a Shadowling using the void that was minted
+    function sacrifice721(
         address token,
-        uint256 id,
-        uint256 amount
+        uint256 tokenId,
+        bool forShadowling
     ) external;
 
-    // ===== Access =====
+    /// @notice Sacrifices `amount` of `token` with `tokenId` to the Shadowpakt, and receives VOID
+    /// @dev    Sacrifice function for ERC1155
+    /// @param  token Asset to sacrifice
+    /// @param  tokenId    Specific asset to sacrifice
+    /// @param  forShadowling If true, mints a Shadowling using the void that was minted
+    function sacrifice1155(
+        address token,
+        uint256 tokenId,
+        uint256 amount,
+        bool forShadowling
+    ) external;
+
+    // ===== Owner =====
 
     /// @notice Sets the void token to this contract
+    /// @dev One time use
     function setVoid(address void_) external;
 
     /// @notice Sets the shadowling contract
+    /// @dev One time use
     function setShadowling(address shadowling_) external;
+
+    /// @notice Sets the cost of minting a shdowling in void tokens
+    function setShadowlingCost(uint256 price) external;
 
     /// @notice Sets the cost of using this currency, denominated in void tokens
     function setCurrencyCost(uint256 currencyId, uint256 newCost) external;
 
-    /// @notice Update an `address` to be whitelisted or not
+    /// @notice Update an `address` of an nft to be whitelisted to receive void on burn
     /// @param  token Address to update the cost value of
-    /// @param  id  Specific tokenId to delist
-    function delist(address token, uint256 id) external;
+    /// @param  amount Amount of void minted per `token` burned
+    function setBaseCost(address token, uint256 amount) external;
 
-    /// @notice Update an `address` to be whitelisted or not
+    /// @notice Sets an extra amount of void received from burning an nft with `tokenId`
     /// @param  token Address to update the cost value of
-    /// @param  base Amount of VOID minted per `token` burned
-    /// @param  extra Amount of VOID minted in addition to the base cost, for `token` with `id
-    function list(
+    /// @param  tokenId  Specific tokenId to delist
+    /// @param  amount Extra amount of void tokens received
+    function setPremiumCost(
         address token,
-        uint256 id,
-        uint256 base,
-        uint256 extra
+        uint256 tokenId,
+        uint256 amount
     ) external;
 
     /// @notice Owner function to pull ERC1155 tokens from this contract for nefarious purposes
     function takeMany(
         address token,
-        uint256 id,
+        uint256 tokenId,
         uint256 amount
     ) external;
 
     /// @notice Owner function to pull ERC721 tokens from this contract for nefarious purposes
-    function takeSingle(address token, uint256 id) external;
+    function takeSingle(address token, uint256 tokenId) external;
 }

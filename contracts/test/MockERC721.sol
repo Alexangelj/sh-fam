@@ -10,4 +10,8 @@ contract MockERC721 is ERC721("NFT", "NFT") {
         _safeMint(msg.sender, id);
         id++;
     }
+
+    function mintId(uint256 tokenId) public {
+        _safeMint(msg.sender, tokenId);
+    }
 }

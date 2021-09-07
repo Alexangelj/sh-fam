@@ -35,20 +35,10 @@ export async function shadowFixture(
   await altar.setShadowling(shdw.address)
 
   let mock721 = await (await ethers.getContractFactory("MockERC721")).deploy()
-  let tokenId = await mock721.id()
-  await mock721.mint()
-  await mock721.mint()
-
   let mock1155 = await (await ethers.getContractFactory("MockERC1155")).deploy()
-  await mock1155.mint()
-  await mock1155.mint()
 
-  await mock721.approve(altar.address, tokenId)
-  await mock721.approve(altar.address, tokenId + 1)
+  await mock721.setApprovalForAll(altar.address, true)
   await mock1155.setApprovalForAll(altar.address, true)
-
-  await altar.list(mock721.address, tokenId, 100, 0)
-  await altar.offering(mock721.address, tokenId)
 
   for (let i = 2; i < 9; i++) {
     await altar.setCurrencyCost(i, 1)

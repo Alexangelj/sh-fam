@@ -29,9 +29,11 @@ contract Altar is
     /// @inheritdoc IAltar
     address public override shadowling;
     /// @inheritdoc IAltar
-    mapping(uint256 => uint256) public override currencyCost;
+    uint256 public override shadowlingCost;
     /// @inheritdoc IAltar
     mapping(address => uint256) public override cost;
+    /// @inheritdoc IAltar
+    mapping(uint256 => uint256) public override currencyCost;
     /// @inheritdoc IAltar
     mapping(address => mapping(uint256 => uint256)) public override premium;
 
@@ -51,107 +53,7 @@ contract Altar is
         _;
     }
 
-    // ===== User Actions =====
-
-    /// @inheritdoc IAltar
-    function offering(address token, uint256 id)
-        external
-        override
-        nonReentrant
-        onlyWhitelisted(token)
-    {
-        address caller = _msgSender();
-        uint256 value = totalCost(token, id);
-        IERC721(token).safeTransferFrom(
-            caller,
-            address(this),
-            id,
-            new bytes(0)
-        );
-
-        IVoid(void).mint(caller, value);
-        emit Sacrificed(msg.sender, token, id, value);
-    }
-
-    /// @inheritdoc IAltar
-    function sacrificeMany(
-        address token,
-        uint256 id,
-        uint256 amount
-    ) external override nonReentrant onlyWhitelisted(token) {
-        if (amount == 0) revert ZeroError();
-        address caller = _msgSender();
-        uint256 value = totalCost(token, id);
-        IERC1155(token).safeTransferFrom(
-            caller,
-            address(this),
-            id,
-            amount,
-            new bytes(0)
-        );
-
-        IVoid(void).mint(caller, value);
-        emit Sacrificed(msg.sender, token, id, value);
-    }
-
-    /// @notice Mints a shadowling
-    function claim(uint256 tokenId)
-        external
-        override
-        nonReentrant
-        onlyShadows(tokenId)
-    {
-        return IShadowling(shadowling).claim(tokenId, _msgSender());
-    }
-
-    /// @notice Summons a shadowling from the shadowchain
-    function summon(uint256 tokenId)
-        external
-        override
-        nonReentrant
-        onlyShadows(tokenId)
-    {
-        return IShadowling(shadowling).summon(tokenId, _msgSender());
-    }
-
-    /// @notice Modifies a shadowling's attributes
-    function modify(uint256 tokenId, uint256 currencyId)
-        external
-        override
-        nonReentrant
-        onlyShadows(tokenId)
-    {
-        burn(currencyId); // send the currency back to the shadowchain
-        return IShadowling(shadowling).modify(tokenId, currencyId);
-    }
-
-    function burn(uint256 currencyId) private {
-        uint256 value = currencyCost[currencyId];
-        if (value == 0) revert CurrencyError();
-        IVoid(void).burn(_msgSender(), value);
-    }
-
-    // ===== Owner Actions =====
-
-    /// @inheritdoc IAltar
-    function list(
-        address token,
-        uint256 id,
-        uint256 base,
-        uint256 extra
-    ) external override onlyOwner {
-        if (base == 0) revert ZeroError();
-        cost[token] = base;
-        if (extra > 0) premium[token][id] = extra;
-        emit Listed(msg.sender, token, base, extra);
-    }
-
-    /// @inheritdoc IAltar
-    function delist(address token, uint256 id) external override onlyOwner {
-        delete cost[token];
-        delete premium[token][id];
-        emit Delisted(msg.sender, token, id);
-    }
+    // === Initialization ===
 
     /// @inheritdoc IAltar
     function setVoid(address void_) external override onlyOwner {
@@ -164,6 +66,129 @@ contract Altar is
         if (shadowling != address(0)) revert InitializedError();
         if (IVoid(shadowling_).owner() == address(this))
             shadowling = shadowling_;
+    }
+
+    // ===== User Actions =====
+
+    /// @inheritdoc IAltar
+    function sacrifice721(
+        address token,
+        uint256 tokenId,
+        bool forShadowling
+    ) external override nonReentrant onlyWhitelisted(token) {
+        address caller = _msgSender();
+        uint256 value = totalCost(token, tokenId);
+
+        if (forShadowling) {
+            IShadowling(shadowling).claim(tokenId, caller);
+            value -= shadowlingCost;
+        }
+
+        IVoid(void).mint(caller, value);
+
+        IERC721(token).safeTransferFrom(
+            caller,
+            address(this),
+            tokenId,
+            new bytes(0)
+        );
+        emit Sacrificed(caller, token, tokenId, value);
+    }
+
+    /// @inheritdoc IAltar
+    function sacrifice1155(
+        address token,
+        uint256 tokenId,
+        uint256 amount,
+        bool forShadowling
+    ) external override nonReentrant onlyWhitelisted(token) {
+        if (amount == 0) revert ZeroError();
+        address caller = _msgSender();
+        uint256 value = totalCost(token, tokenId);
+
+        if (forShadowling) {
+            IShadowling(shadowling).claim(tokenId, caller);
+            value -= shadowlingCost;
+        }
+
+        IVoid(void).mint(caller, value);
+
+        IERC1155(token).safeTransferFrom(
+            caller,
+            address(this),
+            tokenId,
+            amount,
+            new bytes(0)
+        );
+        emit Sacrificed(caller, token, tokenId, value);
+    }
+
+    /// @inheritdoc IAltar
+    function claim(uint256 tokenId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
+    {
+        address caller = _msgSender();
+        burn(shadowlingCost);
+        IShadowling(shadowling).claim(tokenId, caller);
+        emit Claimed(caller, tokenId);
+    }
+
+    /// @inheritdoc IAltar
+    function summon(uint256 tokenId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
+    {
+        IShadowling(shadowling).summon(tokenId, _msgSender());
+    }
+
+    /// @inheritdoc IAltar
+    function modify(uint256 tokenId, uint256 currencyId)
+        external
+        override
+        nonReentrant
+        onlyShadows(tokenId)
+    {
+        uint256 value = currencyCost[currencyId];
+        burn(value); // send the currency back to the shadowchain
+        IShadowling(shadowling).modify(tokenId, currencyId);
+        emit Modified(msg.sender, tokenId, currencyId);
+    }
+
+    function burn(uint256 value) private {
+        if (value == 0) revert ZeroError();
+        IVoid(void).burn(msg.sender, value);
+    }
+
+    // ===== Owner Actions =====
+
+    /// @inheritdoc IAltar
+    function setBaseCost(address token, uint256 amount)
+        external
+        override
+        onlyOwner
+    {
+        cost[token] = amount;
+        emit SetBaseCost(_msgSender(), token, amount);
+    }
+
+    /// @inheritdoc IAltar
+    function setPremiumCost(
+        address token,
+        uint256 tokenId,
+        uint256 amount
+    ) external override onlyOwner {
+        premium[token][tokenId] = amount;
+        emit SetPremiumCost(_msgSender(), token, tokenId, amount);
+    }
+
+    /// @inheritdoc IAltar
+    function setShadowlingCost(uint256 price) external override onlyOwner {
+        shadowlingCost = price;
     }
 
     /// @inheritdoc IAltar
@@ -180,29 +205,29 @@ contract Altar is
     /// @inheritdoc IAltar
     function takeMany(
         address token,
-        uint256 id,
+        uint256 tokenId,
         uint256 amount
     ) external override onlyOwner nonReentrant {
         if (amount == 0) revert ZeroError();
         IERC1155(token).safeTransferFrom(
             address(this),
             owner(),
-            id,
+            tokenId,
             amount,
             new bytes(0)
         );
-        emit Taken(msg.sender, token, id, amount);
+        emit Taken(_msgSender(), token, tokenId, amount);
     }
 
     /// @inheritdoc IAltar
-    function takeSingle(address token, uint256 id)
+    function takeSingle(address token, uint256 tokenId)
         external
         override
         onlyOwner
         nonReentrant
     {
-        IERC721(token).safeTransferFrom(address(this), owner(), id);
-        emit Taken(msg.sender, token, id, 1);
+        IERC721(token).safeTransferFrom(address(this), owner(), tokenId);
+        emit Taken(_msgSender(), token, tokenId, 1);
     }
 
     // ===== Callbacks =====
@@ -213,10 +238,7 @@ contract Altar is
         uint256 tokenId,
         bytes calldata
     ) external override(IERC721Receiver) returns (bytes4) {
-        return
-            bytes4(
-                keccak256("onERC721Received(address,address,uint256,bytes)")
-            );
+        return Altar.onERC721Received.selector;
     }
 
     function onERC1155Received(
@@ -226,12 +248,7 @@ contract Altar is
         uint256 value,
         bytes calldata
     ) external override(IERC1155Receiver) returns (bytes4) {
-        return
-            bytes4(
-                keccak256(
-                    "onERC1155Received(address,address,uint256,uint256,bytes)"
-                )
-            );
+        return Altar.onERC1155Received.selector;
     }
 
     function onERC1155BatchReceived(
@@ -241,12 +258,7 @@ contract Altar is
         uint256[] calldata values,
         bytes calldata
     ) external override(IERC1155Receiver) returns (bytes4) {
-        return
-            bytes4(
-                keccak256(
-                    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
-                )
-            );
+        return Altar.onERC1155BatchReceived.selector;
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -264,13 +276,13 @@ contract Altar is
     // ===== View =====
 
     /// @inheritdoc IAltar
-    function totalCost(address token, uint256 id)
+    function totalCost(address token, uint256 tokenId)
         public
         view
         override
         returns (uint256)
     {
-        return cost[token] + premium[token][id];
+        return cost[token] + premium[token][tokenId];
     }
 
     constructor() {}

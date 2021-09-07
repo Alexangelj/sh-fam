@@ -31,6 +31,13 @@ describe("Shadowling", function () {
     await hre.network.provider.send("evm_setAutomine", [true])
 
     tokenId = Math.floor(6969 * Math.random())
+
+    await altar.setShadowlingCost(1)
+    await altar.setBaseCost(mock721.address, 1000)
+    await altar.setBaseCost(mock1155.address, 1000)
+    await mock721.mintId(tokenId)
+    await mock1155.mintId(tokenId)
+    await altar.sacrifice721(mock721.address, tokenId, false)
   })
 
   it("shadowling#owner", async function () {
@@ -96,7 +103,7 @@ describe("Shadowling", function () {
     it("should claim 500", async function () {
       let images: string[] = []
       let imageData: any = {}
-      for (let i = 100; i < 600; i++) {
+      for (let i = 100; i < 50; i++) {
         try {
           await altar.claim(i)
         } catch (err) {

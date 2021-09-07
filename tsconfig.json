@@ -16,7 +16,8 @@
     "artifacts/**/*.json",
     "scripts/**/*",
     "test/",
-    "hardhat.config.ts"
+    "hardhat.config.ts",
+    "./deploy"
   ],
   "files": ["./hardhat.config.ts"],
   "ts-node": {
