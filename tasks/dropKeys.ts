@@ -44,7 +44,7 @@ task("dropKeys", "Generate keys, saves them on-chain and on local disk")
     const signer = await hre.ethers.getSigner(deployer)
     console.log("Using wallet", deployer)
 
-    const target = await hre.ethers.getContract("Shadowling", signer)
+    const target = await hre.ethers.getContract("Shadowlings", signer)
     console.log(`Using contract at address ${target.address}`)
 
     console.log("Adding the keys to the contract...")

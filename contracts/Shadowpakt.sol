@@ -6,7 +6,15 @@ import "./interfaces/IShadowpakt.sol";
 
 /// @author Clement Lakhal
 contract Shadowpakt is IShadowpakt, Ownable {
+    struct Commit {
+        bytes32 commit;
+        uint64 blockNumber;
+        bool revealed;
+    }
+
     /// STORAGE PROPERTIES ///
+
+    mapping(address => Commit) public commits;
 
     /// @inheritdoc IShadowpakt
     mapping(address => bool) public override isWhitelisted;
@@ -30,6 +38,39 @@ contract Shadowpakt is IShadowpakt, Ownable {
         for (uint256 i = 0; i < hashes.length; i += 1) {
             isHashedKey[hashes[i]] = true;
         }
+    }
+
+    error CommitError();
+
+    function commitKey(bytes32 hashedKey) public {
+        if (!isHashedKey[hashedKey]) revert CommitError();
+        commits[msg.sender] = Commit({
+            commit: hashedKey,
+            blockNumber: uint64(block.number),
+            revealed: false
+        });
+    }
+
+    error RevealedError();
+    error HashError();
+    error BlockError();
+
+    function revealKey(bytes32 revealHash) public {
+        Commit storage commit = commits[msg.sender];
+        if (commit.revealed) revert RevealedError();
+        commit.revealed = true;
+        if (getHash(revealHash) != commit.commit) revert HashError();
+        if (uint64(block.number) <= commit.blockNumber) revert BlockError();
+        if (uint64(block.number) > commit.blockNumber + 250)
+            revert BlockError();
+        bytes32 blockHash = blockhash(commit.blockNumber);
+        uint256 random = uint256(
+            keccak256(abi.encodePacked(blockHash, revealHash))
+        );
+    }
+
+    function getHash(bytes32 keyHash) public view returns (bytes32) {
+        return keccak256(abi.encodePacked(address(this), keyHash));
     }
 
     /// @inheritdoc IShadowpakt

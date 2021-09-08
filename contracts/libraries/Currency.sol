@@ -36,10 +36,13 @@ library Currency {
         pure
         returns (uint256)
     {
-        return Random.slot(prefix, seed, 10000);
+        return uint256(keccak256(abi.encodePacked(prefix, seed))) % 1000000;
     }
 
     /// @notice Modifies an array of values which are the tokenIds for the attributes
+    /// @param currencyId Type of currency being used
+    /// @param params Values to manipulate; directly converted to attributes
+    /// @param seed Pseudorandom value hopefully generated through a commit-reveal scheme
     function modify(
         uint256 currencyId,
         uint256[4] memory params,

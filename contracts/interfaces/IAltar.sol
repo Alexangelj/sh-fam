@@ -127,13 +127,11 @@ interface IAltar {
 
     // ===== Owner =====
 
-    /// @notice Sets the void token to this contract
-    /// @dev One time use
-    function setVoid(address void_) external;
-
-    /// @notice Sets the shadowling contract
-    /// @dev One time use
-    function setShadowling(address shadowling_) external;
+    /// @notice Sets the void token and shadowling contract addresses
+    /// @dev One time use, these contracts must have their `owner` set to this address
+    /// @param void_ Void token contract
+    /// @param shadowling_ Shadowlings ERC721 contract
+    function initialize(address void_, address shadowling_) external;
 
     /// @notice Sets the cost of minting a shdowling in void tokens
     function setShadowlingCost(uint256 price) external;

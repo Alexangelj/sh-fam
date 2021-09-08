@@ -19,7 +19,7 @@ import "./tasks/verifyAll"
 import * as dotenv from "dotenv"
 import { parseUnits } from "@ethersproject/units"
 
-dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, "./.env") })
 
 const { ETHERSCAN_API_KEY, DEPLOYER_KEY, MAINNET_RPC, KOVAN_RPC, RINKEBY_RPC } =
   process.env
@@ -32,8 +32,10 @@ const maxPriorityFeePerGas = parseUnits("20", "gwei")
 
 export default {
   networks: {
-    hardhat: {},
-    kovan: {
+    hardhat: {
+      hardfork: "london",
+    },
+    /* kovan: {
       accounts: [DEPLOYER_KEY],
       chainId: 42,
       url: KOVAN_RPC,
@@ -49,7 +51,7 @@ export default {
       maxFeePerGas: maxFeePerGas,
       maxPriorityFeePerGas: maxPriorityFeePerGas,
       type: "0x02",
-    },
+    }, */
   },
   solidity: {
     compilers: [

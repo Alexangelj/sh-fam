@@ -14,7 +14,7 @@ import "./interfaces/IAltar.sol";
 import "./interfaces/IShadowling.sol";
 import "./libraries/Currency.sol";
 
-/// @notice Mints VOID in exchange for whitelisted NFTs
+/// @notice Summons Shadowlings from the Shadowchain
 contract Altar is
     IAltar,
     Ownable,
@@ -56,13 +56,14 @@ contract Altar is
     // === Initialization ===
 
     /// @inheritdoc IAltar
-    function setVoid(address void_) external override onlyOwner {
+    function initialize(address void_, address shadowling_)
+        external
+        override
+        onlyOwner
+    {
         if (void != address(0)) revert InitializedError();
         if (IVoid(void_).owner() == address(this)) void = void_;
-    }
 
-    /// @inheritdoc IAltar
-    function setShadowling(address shadowling_) external override onlyOwner {
         if (shadowling != address(0)) revert InitializedError();
         if (IVoid(shadowling_).owner() == address(this))
             shadowling = shadowling_;
@@ -80,7 +81,8 @@ contract Altar is
         uint256 value = totalCost(token, tokenId);
 
         if (forShadowling) {
-            IShadowling(shadowling).claim(tokenId, caller);
+            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+            IShadowling(shadowling).claim(tokenId, caller, seed);
             value -= shadowlingCost;
         }
 
@@ -108,7 +110,8 @@ contract Altar is
         if (amount > 1) value = (amount * value) / 1e18; // void token is 18 decimals
 
         if (forShadowling) {
-            IShadowling(shadowling).claim(tokenId, caller);
+            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+            IShadowling(shadowling).claim(tokenId, caller, seed);
             value -= shadowlingCost;
         }
 
@@ -133,7 +136,8 @@ contract Altar is
     {
         address caller = _msgSender();
         burn(shadowlingCost);
-        IShadowling(shadowling).claim(tokenId, caller);
+        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+        IShadowling(shadowling).claim(tokenId, caller, seed);
         emit Claimed(caller, tokenId);
     }
 
@@ -144,7 +148,8 @@ contract Altar is
         nonReentrant
         onlyShadows(tokenId)
     {
-        IShadowling(shadowling).summon(tokenId, _msgSender());
+        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+        IShadowling(shadowling).summon(tokenId, _msgSender(), seed);
     }
 
     /// @inheritdoc IAltar
@@ -156,7 +161,8 @@ contract Altar is
     {
         uint256 value = currencyCost[currencyId];
         burn(value); // send the currency back to the shadowchain
-        IShadowling(shadowling).modify(tokenId, currencyId);
+        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+        IShadowling(shadowling).modify(tokenId, currencyId, seed);
         emit Modified(msg.sender, tokenId, currencyId);
     }
 

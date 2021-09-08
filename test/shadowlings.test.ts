@@ -7,7 +7,7 @@ const { createFixtureLoader } = waffle
 import { log, parseTokenURI, parseImage } from "./shared/utils"
 import { expect } from "chai"
 
-describe("Shadowling", function () {
+describe("Shadowlings", function () {
   let accounts: Wallet[] = waffle.provider.getWallets()
   let altar: Contract
   let token: Contract

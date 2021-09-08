@@ -8,45 +8,45 @@ import "./libraries/Random.sol";
 import "./libraries/MetadataUtils.sol";
 import "./libraries/Currency.sol";
 
-contract Shadowling is ShadowlingMetadata, Ownable, ReentrancyGuard {
+contract Shadowlings is ShadowlingMetadata, Ownable, ReentrancyGuard {
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
     /// @param  tokenId Token with `id` to mint. Maps id to individual item ids in ItemIds
-    function claim(uint256 tokenId, address recipient)
-        external
-        nonReentrant
-        onlyOwner
-    {
-        propertiesOf[tokenId] = Attributes.ids(tokenId);
+    /// @param  recipient Address which is minted a Shadowling
+    /// @param  seed Psuedorandom number hopefully generated from commit-reveal scheme
+    function claim(
+        uint256 tokenId,
+        address recipient,
+        uint256 seed
+    ) external nonReentrant onlyOwner {
+        propertiesOf[tokenId] = Attributes.ids(seed);
         _safeMint(recipient, tokenId);
     }
 
     /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
-    function summon(uint256 tokenId, address recipient)
-        external
-        nonReentrant
-        onlyOwner
-    {
-        Attributes.ItemIds memory state = Attributes.ids(tokenId);
+    /// @param  tokenId Token with `id` to mint. Maps id to individual item ids in ItemIds
+    /// @param  recipient Address which is minted a Shadowling
+    /// @param  seed Psuedorandom number hopefully generated from commit-reveal scheme
+    function summon(
+        uint256 tokenId,
+        address recipient,
+        uint256 seed
+    ) external nonReentrant onlyOwner {
+        Attributes.ItemIds memory state = Attributes.ids(seed);
         state.origin = Attributes.originId(tokenId, true);
         propertiesOf[tokenId] = state;
         _safeMint(recipient, tokenId);
     }
 
-    function modify(uint256 tokenId, uint256 currencyId)
-        external
-        nonReentrant
-        onlyOwner
-    {
+    /// @notice Modifies the attributes of Shadowling with `tokenId` using the type of currency
+    /// @param tokenId Shadowling tokenId to modify
+    /// @param currencyId Type of currency to use
+    /// @param seed Pseudorandom value hopefully generated from a commit-reveal scheme
+    function modify(
+        uint256 tokenId,
+        uint256 currencyId,
+        uint256 seed
+    ) external nonReentrant onlyOwner {
         Attributes.ItemIds memory cache = propertiesOf[tokenId]; // cache the shadowling props
-
-        string memory bloodline = Attributes.encodedIdToString(cache.bloodline);
-        uint256 startSeed = Random.getBloodSeed(tokenId, bloodline);
-        string memory sequence = Random.sequence(startSeed);
-        uint256 seed = uint256(
-            keccak256(
-                abi.encodePacked("MODIFY", toString(currencyId), sequence)
-            )
-        );
 
         uint256[4] memory values;
         values[0] = cache.creature;
@@ -54,7 +54,7 @@ contract Shadowling is ShadowlingMetadata, Ownable, ReentrancyGuard {
         values[2] = cache.ability;
         values[3] = cache.name;
 
-        values = Currency.modify(currencyId, values, seed);
+        values = Currency.modify(currencyId, values, seed); // Most important fn
 
         cache.creature = values[0] > 0 ? Attributes.creatureId(values[0]) : 0;
         cache.flaw = values[1] > 0 ? Attributes.flawId(values[1]) : 0;

@@ -57,17 +57,14 @@ library Attributes {
 
     /// @notice Returns an SVG for the provided token id
     /// @param  item Attributes of an item as strings
-    /// @param  last Additional data to append to SVG string
-    /// @return SVG string
-    function render(ItemStrings memory item, string memory last)
+    /// @return SVG string that renders the Attributes as text
+    function render(ItemStrings memory item)
         internal
         pure
         returns (string memory)
     {
         string[13] memory parts;
-        parts[
-            0
-        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="black" /><text x="10" y="20" class="base">';
+        parts[0] = '<text x="10" y="20" class="base">';
 
         parts[1] = item.creature;
 
@@ -91,7 +88,7 @@ library Attributes {
 
         parts[11] = item.name;
 
-        parts[12] = '</text><text x="10" y="140" class="base">';
+        parts[12] = "</text>";
 
         string memory output = string(
             abi.encodePacked(
@@ -110,17 +107,6 @@ library Attributes {
         output = string(
             abi.encodePacked(output, parts[9], parts[10], parts[11], parts[12])
         );
-
-        output = string(abi.encodePacked(output, last, "</text></svg>"));
-
-        output = string(
-            abi.encodePacked(
-                '"image": "data:image/svg+xml;base64,',
-                Base64.encode(bytes(output)),
-                '", '
-            )
-        );
-
         return output;
     }
 
@@ -136,9 +122,7 @@ library Attributes {
         string memory output;
 
         // should we also use components[0] which contains the item name?
-        string memory res = string(
-            abi.encodePacked("[", trait(Scanner.getItemType(0), items.creature))
-        );
+        string memory res = trait(Scanner.getItemType(0), items.creature);
 
         res = string(
             abi.encodePacked(
@@ -180,57 +164,57 @@ library Attributes {
             )
         );
 
-        res = string(abi.encodePacked(res, "]"));
+        //res = string(abi.encodePacked(res, "]"));
 
-        output = string(abi.encodePacked('"attributes": ', res, "}"));
-        return output;
+        //output = string(abi.encodePacked('"attributes": ', res, "}"));
+        return res;
     }
 
     // ===== Encode Individual Item Ids =====
 
     // View helpers for getting the item ID that corresponds to a bag's items
-    function creatureId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.creatureComponents(), Scanner.CREATURE);
+    function creatureId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.creatureComponents(), Scanner.CREATURE);
     }
 
-    function flawId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.flawComponents(), Scanner.FLAW);
+    function flawId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.flawComponents(), Scanner.FLAW);
     }
 
-    function originId(uint256 tokenId, bool shadowChain)
+    function originId(uint256 seed, bool shadowChain)
         internal
         pure
         returns (uint256)
     {
-        return
-            TokenId.toId(tokenId.originComponents(shadowChain), Scanner.ORIGIN);
+        return TokenId.toId(seed.originComponents(shadowChain), Scanner.ORIGIN);
     }
 
-    function bloodlineId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.bloodlineComponents(), Scanner.BLOODLINE);
+    function bloodlineId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.bloodlineComponents(), Scanner.BLOODLINE);
     }
 
-    function abilityId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.abilityComponents(), Scanner.ABILITY);
+    function abilityId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.abilityComponents(), Scanner.ABILITY);
     }
 
-    function nameId(uint256 tokenId) internal pure returns (uint256) {
-        return TokenId.toId(tokenId.nameComponents(), Scanner.NAME);
+    function nameId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.nameComponents(), Scanner.NAME);
     }
 
     // ===== Utility =====
 
-    /// @notice Converts a `tokenId` into an Item with ids
+    /// @notice Uses a seed to get 6 items, each with their own encoded Ids
+    /// @param seed Pseudorandom number hopefully generated from a commit-reveal scheme
     /// @return Item attributes as ids
-    function ids(uint256 tokenId) internal pure returns (ItemIds memory) {
+    function ids(uint256 seed) internal pure returns (ItemIds memory) {
         return
             ItemIds({
-                creature: Attributes.creatureId(tokenId),
-                flaw: Attributes.flawId(tokenId),
-                origin: Attributes.originId(tokenId, false),
-                bloodline: Attributes.bloodlineId(tokenId),
-                ability: Attributes.abilityId(tokenId),
-                name: Attributes.nameId(tokenId)
+                creature: Attributes.creatureId(seed),
+                flaw: Attributes.flawId(seed),
+                origin: Attributes.originId(seed, false),
+                bloodline: Attributes.bloodlineId(seed),
+                ability: Attributes.abilityId(seed),
+                name: Attributes.nameId(seed)
             });
     }
 
