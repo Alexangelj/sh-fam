@@ -132,10 +132,6 @@ library Stats {
 
         // get 3 highest dice rolls
         uint256 stat = roll1 + roll2 + roll3 + roll4 - min;
-        string memory output = string(
-            abi.encodePacked(keyPrefix, ": ", toString(stat))
-        );
-
-        return output;
+        return toString(stat);
     }
 }

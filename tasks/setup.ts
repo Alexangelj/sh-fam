@@ -43,10 +43,6 @@ task("setup", "Initializes state of altar").setAction(async (args, hre) => {
     shadowlingAddress = await altar.shadowling()
   }
 
-  // set the cost to mint a shadowling in void tokens
-  await altar.setShadowlingCost(SHADOWLING_COST)
-  console.log(`   - Set Shadowling cost to: ${SHADOWLING_COST}`)
-
   // for each currency type, set its cost in void tokens
   for (let i = 2; i < 9; i++) {
     if ((await altar.currencyCost(i)).eq(0)) {

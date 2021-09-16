@@ -8,12 +8,6 @@ interface IShadowling {
         uint256 seed
     ) external;
 
-    function summon(
-        uint256 tokenId,
-        address recipient,
-        uint256 seed
-    ) external;
-
     function modify(
         uint256 tokenId,
         uint256 currencyId,

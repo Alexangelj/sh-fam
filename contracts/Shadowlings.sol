@@ -22,21 +22,6 @@ contract Shadowlings is ShadowlingMetadata, Ownable, ReentrancyGuard {
         _safeMint(recipient, tokenId);
     }
 
-    /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
-    /// @param  tokenId Token with `id` to mint. Maps id to individual item ids in ItemIds
-    /// @param  recipient Address which is minted a Shadowling
-    /// @param  seed Psuedorandom number hopefully generated from commit-reveal scheme
-    function summon(
-        uint256 tokenId,
-        address recipient,
-        uint256 seed
-    ) external nonReentrant onlyOwner {
-        Attributes.ItemIds memory state = Attributes.ids(seed);
-        state.origin = Attributes.originId(tokenId, true);
-        propertiesOf[tokenId] = state;
-        _safeMint(recipient, tokenId);
-    }
-
     /// @notice Modifies the attributes of Shadowling with `tokenId` using the type of currency
     /// @param tokenId Shadowling tokenId to modify
     /// @param currencyId Type of currency to use

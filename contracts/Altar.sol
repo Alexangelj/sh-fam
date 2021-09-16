@@ -13,10 +13,12 @@ import "./interfaces/IVoid.sol";
 import "./interfaces/IAltar.sol";
 import "./interfaces/IShadowling.sol";
 import "./libraries/Currency.sol";
+import "./Shadowpakt.sol";
 
 /// @notice Summons Shadowlings from the Shadowchain
 contract Altar is
     IAltar,
+    Shadowpakt,
     Ownable,
     ReentrancyGuard,
     IERC1155Receiver,
@@ -25,11 +27,11 @@ contract Altar is
     using SafeERC20 for IERC20;
 
     /// @inheritdoc IAltar
+    uint256 public constant override SHADOWLING_COST = 10000e18;
+    /// @inheritdoc IAltar
     address public override void;
     /// @inheritdoc IAltar
     address public override shadowling;
-    /// @inheritdoc IAltar
-    uint256 public override shadowlingCost;
     /// @inheritdoc IAltar
     mapping(address => uint256) public override cost;
     /// @inheritdoc IAltar
@@ -43,12 +45,12 @@ contract Altar is
     }
 
     modifier onlyShadows(uint256 tokenId) {
-        if (tokenId < Currency.START_INDEX || tokenId < 1) revert TokenError();
+        if (tokenId < Currency.START_INDEX) revert TokenError();
         _;
     }
 
-    modifier onlyCurrency(uint256 tokenId) {
-        if (tokenId > Currency.START_INDEX - 1 || tokenId < 1)
+    modifier onlyCurrency(uint256 currencyId) {
+        if (currencyId > Currency.START_INDEX - 1 || currencyId < 1)
             revert CurrencyError();
         _;
     }
@@ -75,15 +77,19 @@ contract Altar is
     function sacrifice721(
         address token,
         uint256 tokenId,
-        bool forShadowling
+        uint256 shadowlingId
     ) external override nonReentrant onlyWhitelisted(token) {
         address caller = _msgSender();
         uint256 value = totalCost(token, tokenId);
 
-        if (forShadowling) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
-            IShadowling(shadowling).claim(tokenId, caller, seed);
-            value -= shadowlingCost;
+        if (shadowlingId > Currency.START_INDEX) {
+            uint256 seed = uint256(
+                keccak256(
+                    abi.encodePacked(address(this), shadowlingId, tokenId)
+                )
+            );
+            IShadowling(shadowling).claim(shadowlingId, caller, seed);
+            value -= SHADOWLING_COST;
         }
 
         IVoid(void).mint(caller, value);
@@ -94,7 +100,7 @@ contract Altar is
             tokenId,
             new bytes(0)
         );
-        emit Sacrificed(caller, token, tokenId, value);
+        emit Sacrificed(caller, token, tokenId, 1, value, shadowlingId);
     }
 
     /// @inheritdoc IAltar
@@ -102,17 +108,21 @@ contract Altar is
         address token,
         uint256 tokenId,
         uint256 amount,
-        bool forShadowling
+        uint256 shadowlingId
     ) external override nonReentrant onlyWhitelisted(token) {
         if (amount == 0) revert ZeroError();
         address caller = _msgSender();
         uint256 value = totalCost(token, tokenId);
-        if (amount > 1) value = (amount * value) / 1e18; // void token is 18 decimals
+        if (amount > 1) value = (amount * value) / 1e18; // void token has 18 decimals
 
-        if (forShadowling) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
-            IShadowling(shadowling).claim(tokenId, caller, seed);
-            value -= shadowlingCost;
+        if (shadowlingId > Currency.START_INDEX) {
+            uint256 seed = uint256(
+                keccak256(
+                    abi.encodePacked(address(this), shadowlingId, tokenId)
+                )
+            );
+            IShadowling(shadowling).claim(shadowlingId, caller, seed);
+            value -= SHADOWLING_COST;
         }
 
         IVoid(void).mint(caller, value);
@@ -124,44 +134,32 @@ contract Altar is
             amount,
             new bytes(0)
         );
-        emit Sacrificed(caller, token, tokenId, value);
+        emit Sacrificed(caller, token, tokenId, amount, value, shadowlingId);
     }
 
     /// @inheritdoc IAltar
-    function claim(uint256 tokenId)
+    function claim(uint256 tokenId, bytes32 revealHash)
         external
         override
         nonReentrant
         onlyShadows(tokenId)
     {
+        burn(SHADOWLING_COST);
+        uint256 seed = revealKey(revealHash);
         address caller = _msgSender();
-        burn(shadowlingCost);
-        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
         IShadowling(shadowling).claim(tokenId, caller, seed);
         emit Claimed(caller, tokenId);
     }
 
     /// @inheritdoc IAltar
-    function summon(uint256 tokenId)
-        external
-        override
-        nonReentrant
-        onlyShadows(tokenId)
-    {
-        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
-        IShadowling(shadowling).summon(tokenId, _msgSender(), seed);
-    }
-
-    /// @inheritdoc IAltar
-    function modify(uint256 tokenId, uint256 currencyId)
-        external
-        override
-        nonReentrant
-        onlyShadows(tokenId)
-    {
+    function modify(
+        uint256 tokenId,
+        uint256 currencyId,
+        bytes32 revealHash
+    ) external override nonReentrant onlyShadows(tokenId) {
         uint256 value = currencyCost[currencyId];
         burn(value); // send the currency back to the shadowchain
-        uint256 seed = uint256(keccak256(abi.encodePacked(tokenId)));
+        uint256 seed = revealKey(revealHash);
         IShadowling(shadowling).modify(tokenId, currencyId, seed);
         emit Modified(msg.sender, tokenId, currencyId);
     }
@@ -191,11 +189,6 @@ contract Altar is
     ) external override onlyOwner {
         premium[token][tokenId] = amount;
         emit SetPremiumCost(_msgSender(), token, tokenId, amount);
-    }
-
-    /// @inheritdoc IAltar
-    function setShadowlingCost(uint256 price) external override onlyOwner {
-        shadowlingCost = price;
     }
 
     /// @inheritdoc IAltar
