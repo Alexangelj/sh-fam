@@ -19,7 +19,7 @@ interface IShadowling {
         view
         returns (
             uint256 creature,
-            uint256 flaw,
+            uint256 item,
             uint256 origin,
             uint256 bloodline,
             uint256 eyes,

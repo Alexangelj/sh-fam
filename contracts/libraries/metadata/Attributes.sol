@@ -22,34 +22,32 @@ library Attributes {
     /// @notice Item Attribute Identifiers
     struct ItemIds {
         uint256 creature;
-        uint256 flaw;
+        uint256 item;
         uint256 origin;
         uint256 bloodline;
-        uint256 ability;
+        uint256 perk;
         uint256 name;
     }
 
     /// @notice Item Attributes Raw
     struct ItemStrings {
         string creature;
-        string flaw;
+        string item;
         string origin;
         string bloodline;
-        string ability;
+        string perk;
         string name;
     }
 
     // ===== Encoding Ids =====
 
     /// @notice Given an item id, returns its name by decoding and parsing the id
-    function encodedIdToString(uint256 itemId)
+    function encodedIdToString(uint256 id)
         internal
         pure
         returns (string memory)
     {
-        (uint256[5] memory components, uint256 itemType) = TokenId.fromId(
-            itemId
-        );
+        (uint256[5] memory components, uint256 itemType) = TokenId.fromId(id);
         return Scanner.componentsToString(components, itemType);
     }
 
@@ -70,7 +68,7 @@ library Attributes {
 
         parts[2] = '</text><text x="10" y="40" class="base">';
 
-        parts[3] = item.flaw;
+        parts[3] = item.item;
 
         parts[4] = '</text><text x="10" y="60" class="base">';
 
@@ -82,7 +80,7 @@ library Attributes {
 
         parts[8] = '</text><text x="10" y="100" class="base">';
 
-        parts[9] = item.ability;
+        parts[9] = item.perk;
 
         parts[10] = '</text><text x="10" y="120" class="base">';
 
@@ -119,16 +117,13 @@ library Attributes {
         pure
         returns (string memory)
     {
-        string memory output;
-
-        // should we also use components[0] which contains the item name?
         string memory res = trait(Scanner.getItemType(0), items.creature);
 
         res = string(
             abi.encodePacked(
                 res,
                 ", ",
-                trait(Scanner.getItemType(1), items.flaw)
+                trait(Scanner.getItemType(1), items.item)
             )
         );
 
@@ -152,7 +147,7 @@ library Attributes {
             abi.encodePacked(
                 res,
                 ", ",
-                trait(Scanner.getItemType(4), items.ability)
+                trait(Scanner.getItemType(4), items.perk)
             )
         );
 
@@ -163,10 +158,6 @@ library Attributes {
                 trait(Scanner.getItemType(5), items.name)
             )
         );
-
-        //res = string(abi.encodePacked(res, "]"));
-
-        //output = string(abi.encodePacked('"attributes": ', res, "}"));
         return res;
     }
 
@@ -177,8 +168,8 @@ library Attributes {
         return TokenId.toId(seed.creatureComponents(), Scanner.CREATURE);
     }
 
-    function flawId(uint256 seed) internal pure returns (uint256) {
-        return TokenId.toId(seed.flawComponents(), Scanner.FLAW);
+    function itemId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.itemComponents(), Scanner.ITEM);
     }
 
     function originId(uint256 seed, bool shadowChain)
@@ -193,8 +184,8 @@ library Attributes {
         return TokenId.toId(seed.bloodlineComponents(), Scanner.BLOODLINE);
     }
 
-    function abilityId(uint256 seed) internal pure returns (uint256) {
-        return TokenId.toId(seed.abilityComponents(), Scanner.ABILITY);
+    function perkId(uint256 seed) internal pure returns (uint256) {
+        return TokenId.toId(seed.perkComponents(), Scanner.PERK);
     }
 
     function nameId(uint256 seed) internal pure returns (uint256) {
@@ -210,10 +201,10 @@ library Attributes {
         return
             ItemIds({
                 creature: Attributes.creatureId(seed),
-                flaw: Attributes.flawId(seed),
+                item: Attributes.itemId(seed),
                 origin: Attributes.originId(seed, false),
                 bloodline: Attributes.bloodlineId(seed),
-                ability: Attributes.abilityId(seed),
+                perk: Attributes.perkId(seed),
                 name: Attributes.nameId(seed)
             });
     }
@@ -228,10 +219,10 @@ library Attributes {
         return
             ItemStrings({
                 creature: encodedIdToString(items.creature),
-                flaw: encodedIdToString(items.flaw),
+                item: encodedIdToString(items.item),
                 origin: encodedIdToString(items.origin),
                 bloodline: encodedIdToString(items.bloodline),
-                ability: encodedIdToString(items.ability),
+                perk: encodedIdToString(items.perk),
                 name: encodedIdToString(items.name)
             });
     }

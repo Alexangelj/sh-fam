@@ -52,9 +52,6 @@ library Stats {
     /// @notice Returns the attributes of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
     function attributes(uint256 tokenId) internal pure returns (string memory) {
-        string memory output;
-
-        // should we also use components[0] which contains the item name?
         string memory res = trait("Str", strStat(tokenId));
 
         res = string(

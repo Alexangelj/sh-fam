@@ -15,14 +15,14 @@ library Scanner {
     // ===== Attribute Slots =====
 
     uint256 internal constant CREATURE = 0x0;
-    uint256 internal constant FLAW = 0x1;
+    uint256 internal constant ITEM = 0x1;
     uint256 internal constant ORIGIN = 0x2;
     uint256 internal constant BLOODLINE = 0x3;
-    uint256 internal constant ABILITY = 0x4;
+    uint256 internal constant PERK = 0x4;
     uint256 internal constant NAME = 0x5;
 
     string internal constant itemTypes =
-        "Creature,Flaw,Origin,Bloodline,Ability,Name";
+        "Creature,Item,Origin,Bloodline,Perk,Name";
 
     // ====== Item Slot Fetcher =====
 
@@ -86,14 +86,14 @@ library Scanner {
         string memory arr;
         if (itemType == CREATURE) {
             arr = Components.creatures;
-        } else if (itemType == FLAW) {
-            arr = Components.flaws;
+        } else if (itemType == ITEM) {
+            arr = Components.items;
         } else if (itemType == ORIGIN) {
             arr = Components.origins;
         } else if (itemType == BLOODLINE) {
             arr = Components.bloodlines;
-        } else if (itemType == ABILITY) {
-            arr = Components.abilities;
+        } else if (itemType == PERK) {
+            arr = Components.perks;
         } else if (itemType == NAME) {
             arr = Components.names;
         } else {
@@ -157,7 +157,7 @@ library Scanner {
 
         // add the augmentation
         if (components[4] > 0) {
-            item = string(abi.encodePacked(item, " +1"));
+            item = string(abi.encodePacked(item, " +SE"));
         }
 
         return item;

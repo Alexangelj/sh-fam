@@ -33,7 +33,7 @@ export default {
     hardhat: {
       hardfork: "london",
     },
-    /* kovan: {
+    kovan: {
       accounts: [DEPLOYER_KEY],
       chainId: 42,
       url: KOVAN_RPC,
@@ -49,7 +49,7 @@ export default {
       maxFeePerGas: maxFeePerGas,
       maxPriorityFeePerGas: maxPriorityFeePerGas,
       type: "0x02",
-    }, */
+    },
   },
   solidity: {
     compilers: [

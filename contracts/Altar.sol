@@ -234,30 +234,30 @@ contract Altar is
 
     function onERC721Received(
         address,
-        address from,
-        uint256 tokenId,
+        address,
+        uint256,
         bytes calldata
-    ) external override(IERC721Receiver) returns (bytes4) {
+    ) external pure override(IERC721Receiver) returns (bytes4) {
         return Altar.onERC721Received.selector;
     }
 
     function onERC1155Received(
         address,
-        address from,
-        uint256 tokenId,
-        uint256 value,
+        address,
+        uint256,
+        uint256,
         bytes calldata
-    ) external override(IERC1155Receiver) returns (bytes4) {
+    ) external pure override(IERC1155Receiver) returns (bytes4) {
         return Altar.onERC1155Received.selector;
     }
 
     function onERC1155BatchReceived(
         address,
-        address from,
-        uint256[] calldata ids,
-        uint256[] calldata values,
+        address,
+        uint256[] calldata,
+        uint256[] calldata,
         bytes calldata
-    ) external override(IERC1155Receiver) returns (bytes4) {
+    ) external pure override(IERC1155Receiver) returns (bytes4) {
         return Altar.onERC1155BatchReceived.selector;
     }
 

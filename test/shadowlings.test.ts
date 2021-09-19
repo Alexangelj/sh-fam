@@ -116,7 +116,40 @@ describe("Shadowlings", function () {
       log(json)
     })
 
-    it("should claim 50", async function () {
+    it("should modify traits of 50", async function () {
+      let images: string[] = []
+      let imageData: any = {}
+      for (let i = 100; i < 150; i++) {
+        revealHash = formatBytes32String((i * Math.random()).toString())
+        await altar.commitKey(await altar.getHash(revealHash))
+        await hre.network.provider.send("evm_mine")
+        try {
+          await altar.claim(i, revealHash)
+          revealHash = formatBytes32String("gop")
+          const hashedKey = await altar.getHash(revealHash)
+          await altar.commitKey(hashedKey)
+          await hre.network.provider.send("evm_mine")
+          await altar.modify(i, 6, revealHash)
+          revealHash = formatBytes32String("yeet")
+          const hashed = await altar.getHash(revealHash)
+          await altar.commitKey(hashed)
+          await hre.network.provider.send("evm_mine")
+          await altar.modify(i, 5, revealHash)
+        } catch (err) {
+          console.log("Error on:", i, err)
+        }
+        const uri = await shdw.tokenURI(i)
+        const json = parseTokenURI(uri)
+        const image = parseImage(json)
+        images.push(image)
+        imageData[i] = json.image
+        log(json)
+      }
+
+      await fs.promises.writeFile("./data.json", JSON.stringify(imageData))
+    })
+
+    it.skip("should claim 50", async function () {
       let images: string[] = []
       let imageData: any = {}
       for (let i = 100; i < 150; i++) {
