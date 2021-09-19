@@ -30,11 +30,6 @@ export const CURRENCY_COSTS: { [currencyId: number]: BigNumber } = {
 }
 
 /**
- * @notice Cost to conjure a shadowling, in void tokens
- */
-export const SHADOWLING_COST = parseEther("100")
-
-/**
  * @notice Mapping of nft addresses to base costs
  */
 export const BASE_COSTS: { [token: string]: BigNumber } = {

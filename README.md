@@ -1,18 +1,12 @@
 # Shadowlings
 
-Try running some of the following tasks:
+![](https://i.imgur.com/WEYbyY2.png)
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+# Guide
 
-## Tools
+[Guide](https://hackmd.io/3MhotTlqQ3ykaTenc5VsyA)
+
+# Tools
 
 First, deploy the contracts using `npx hardhat deploy --network <networkName>`
 
