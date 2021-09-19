@@ -24,7 +24,9 @@ interface IAltar {
         address indexed from,
         address indexed token,
         uint256 indexed tokenId,
-        uint256 value
+        uint256 amount,
+        uint256 value,
+        uint256 shadowlingId
     );
 
     /// @notice Emitted when an owner removes tokens
@@ -61,68 +63,41 @@ interface IAltar {
     /// @notice Thrown on attempting to use inccorect tokenId
     error TokenError();
 
-    // ===== View =====
-
-    /// @notice Void Token to mint
-    function void() external view returns (address);
-
-    /// @notice Shadowling NFT
-    function shadowling() external view returns (address);
-
-    /// @notice Void burned for conjuring a Shadowling
-    function shadowlingCost() external view returns (uint256);
-
-    /// @notice Cost of the NFT with `address`, denominated in VOID tokens
-    function cost(address token) external view returns (uint256);
-
-    /// @notice Maps currencyIds to their respective Void token cost
-    function currencyCost(uint256 currencyId) external view returns (uint256);
-
-    /// @notice Additional premium cost of an NFT with `tokenId`, denominated in VOID tokens
-    function premium(address token, uint256 tokenId)
-        external
-        view
-        returns (uint256);
-
-    /// @return Amount of VOID minted from sacrificing `token` with `tokenId
-    function totalCost(address token, uint256 tokenId)
-        external
-        view
-        returns (uint256);
-
     // ===== User =====
 
     /// @notice Mints Shadowlings to `msg.sender`, cannot mint 0 tokenId
     /// @param  tokenId Token with `tokenId` to mint. Maps tokenId to individual item ids in ItemIds
-    function claim(uint256 tokenId) external;
-
-    /// @notice Mints Shadowchain Origin Shadowlings to shadowpakt members, cannot mint 0 tokenId
-    function summon(uint256 tokenId) external;
+    /// @param  revealHash Unhashed key used in a commit
+    function claim(uint256 tokenId, bytes32 revealHash) external;
 
     /// @notice Modifies a Shadowling using with the `currencyId`, changing its attributes
-    function modify(uint256 tokenId, uint256 currencyId) external;
+    function modify(
+        uint256 tokenId,
+        uint256 currencyId,
+        bytes32 revealHash
+    ) external;
 
     /// @notice Sacrifices `token` with `tokenId` to the Shadowpakt, and receives VOID
     /// @dev    Sacrifice function for ERC721, must be approved beforehand
     /// @param  token Asset to sacrifice
     /// @param  tokenId    Specific asset to sacrifice
-    /// @param  forShadowling If true, mints a Shadowling using the void that was minted
+    /// @param  shadowlingId If greater than start index, mints shadowling
     function sacrifice721(
         address token,
         uint256 tokenId,
-        bool forShadowling
+        uint256 shadowlingId
     ) external;
 
     /// @notice Sacrifices `amount` of `token` with `tokenId` to the Shadowpakt, and receives VOID
     /// @dev    Sacrifice function for ERC1155
     /// @param  token Asset to sacrifice
     /// @param  tokenId    Specific asset to sacrifice
-    /// @param  forShadowling If true, mints a Shadowling using the void that was minted
+    /// @param  shadowlingId If greater than start index, mints shadowling
     function sacrifice1155(
         address token,
         uint256 tokenId,
         uint256 amount,
-        bool forShadowling
+        uint256 shadowlingId
     ) external;
 
     // ===== Owner =====
@@ -132,9 +107,6 @@ interface IAltar {
     /// @param void_ Void token contract
     /// @param shadowling_ Shadowlings ERC721 contract
     function initialize(address void_, address shadowling_) external;
-
-    /// @notice Sets the cost of minting a shdowling in void tokens
-    function setShadowlingCost(uint256 price) external;
 
     /// @notice Sets the cost of using this currency, denominated in void tokens
     function setCurrencyCost(uint256 currencyId, uint256 newCost) external;
@@ -163,4 +135,35 @@ interface IAltar {
 
     /// @notice Owner function to pull ERC721 tokens from this contract for nefarious purposes
     function takeSingle(address token, uint256 tokenId) external;
+
+    // ===== Constant =====
+
+    /// @notice Void burned for conjuring a Shadowling
+    function SHADOWLING_COST() external view returns (uint256);
+
+    // ===== View =====
+
+    /// @notice Void Token to mint
+    function void() external view returns (address);
+
+    /// @notice Shadowling NFT
+    function shadowling() external view returns (address);
+
+    /// @notice Cost of the NFT with `address`, denominated in VOID tokens
+    function cost(address token) external view returns (uint256);
+
+    /// @notice Maps currencyIds to their respective Void token cost
+    function currencyCost(uint256 currencyId) external view returns (uint256);
+
+    /// @notice Additional premium cost of an NFT with `tokenId`, denominated in VOID tokens
+    function premium(address token, uint256 tokenId)
+        external
+        view
+        returns (uint256);
+
+    /// @return Amount of VOID minted from sacrificing `token` with `tokenId
+    function totalCost(address token, uint256 tokenId)
+        external
+        view
+        returns (uint256);
 }

@@ -6,6 +6,13 @@ const { createFixtureLoader } = waffle
 
 import { log, parseTokenURI, parseImage } from "./shared/utils"
 import { expect } from "chai"
+import {
+  formatBytes32String,
+  keccak256,
+  parseEther,
+  sha256,
+  solidityKeccak256,
+} from "ethers/lib/utils"
 
 describe("Shadowlings", function () {
   let accounts: Wallet[] = waffle.provider.getWallets()
@@ -16,7 +23,7 @@ describe("Shadowlings", function () {
   let mock721: Contract
   let mock1155: Contract
   let fixture: ShadowFixture
-  let shdw: Contract
+  let shdw: Contract, revealHash: string
 
   const loadFixture = createFixtureLoader(accounts, waffle.provider)
 
@@ -32,12 +39,15 @@ describe("Shadowlings", function () {
 
     tokenId = Math.floor(6969 * Math.random())
 
-    await altar.setShadowlingCost(1)
-    await altar.setBaseCost(mock721.address, 1000)
-    await altar.setBaseCost(mock1155.address, 1000)
+    await altar.setBaseCost(mock721.address, parseEther("1000000"))
+    await altar.setBaseCost(mock1155.address, parseEther("1000000"))
     await mock721.mintId(tokenId)
     await mock1155.mintId(tokenId)
-    await altar.sacrifice721(mock721.address, tokenId, false)
+    await altar.sacrifice721(mock721.address, tokenId, 0)
+    revealHash = formatBytes32String("pug")
+    const hashedKey = await altar.getHash(revealHash)
+    await altar.commitKey(hashedKey)
+    await hre.network.provider.send("evm_mine")
   })
 
   it("shadowling#owner", async function () {
@@ -46,30 +56,24 @@ describe("Shadowlings", function () {
 
   describe("altar#claim", function () {
     it("should claim tokenId 1", async function () {
-      await altar.claim(tokenId)
+      await altar.claim(tokenId, revealHash)
       let uri = await shdw.tokenURI(tokenId)
       let json = parseTokenURI(uri)
       log(json)
     })
 
     it("should claim tokenId 1, print its props, then change it and re print", async function () {
-      await altar.claim(tokenId)
+      await altar.claim(tokenId, revealHash)
       let uri = await shdw.tokenURI(tokenId)
       let json = parseTokenURI(uri)
       log(json)
-      await altar.modify(tokenId, 2)
+      revealHash = formatBytes32String("yoga")
+      const hashedKey = await altar.getHash(revealHash)
+      await altar.commitKey(hashedKey)
+      await hre.network.provider.send("evm_mine")
+      await altar.modify(tokenId, 2, revealHash)
       uri = await shdw.tokenURI(tokenId)
       json = parseTokenURI(uri)
-      log(json)
-    })
-  })
-
-  describe("altar#summon", function () {
-    it("should summon a shadowchain entity", async function () {
-      let i = tokenId
-      await altar.summon(i)
-      let uri = await shdw.tokenURI(i)
-      let json = parseTokenURI(uri)
       log(json)
     })
   })
@@ -77,11 +81,15 @@ describe("Shadowlings", function () {
   describe("altar#modify", function () {
     it("should modify all four traits", async function () {
       let i = tokenId
-      await altar.summon(i)
+      await altar.claim(i, revealHash)
       let uri = await shdw.tokenURI(i)
       let json = parseTokenURI(uri)
       log(json)
-      await altar.modify(i, 2)
+      revealHash = formatBytes32String("pog")
+      const hashedKey = await altar.getHash(revealHash)
+      await altar.commitKey(hashedKey)
+      await hre.network.provider.send("evm_mine")
+      await altar.modify(i, 2, revealHash)
       uri = await shdw.tokenURI(i)
       json = parseTokenURI(uri)
       log(json)
@@ -89,23 +97,67 @@ describe("Shadowlings", function () {
 
     it("should remove all four traits then add them", async function () {
       let i = tokenId
-      await altar.summon(i)
-      await altar.modify(i, 6)
+      await altar.claim(i, revealHash)
+      revealHash = formatBytes32String("gop")
+      const hashedKey = await altar.getHash(revealHash)
+      await altar.commitKey(hashedKey)
+      await hre.network.provider.send("evm_mine")
+      await altar.modify(i, 6, revealHash)
       let uri = await shdw.tokenURI(i)
       let json = parseTokenURI(uri)
       log(json)
-      await altar.modify(i, 5)
+      revealHash = formatBytes32String("yoda")
+      const hashed = await altar.getHash(revealHash)
+      await altar.commitKey(hashed)
+      await hre.network.provider.send("evm_mine")
+      await altar.modify(i, 5, revealHash)
       uri = await shdw.tokenURI(i)
       json = parseTokenURI(uri)
       log(json)
     })
 
-    it("should claim 50", async function () {
+    it("should modify traits of 50", async function () {
       let images: string[] = []
       let imageData: any = {}
       for (let i = 100; i < 150; i++) {
+        revealHash = formatBytes32String((i * Math.random()).toString())
+        await altar.commitKey(await altar.getHash(revealHash))
+        await hre.network.provider.send("evm_mine")
         try {
-          await altar.claim(i)
+          await altar.claim(i, revealHash)
+          revealHash = formatBytes32String("gop")
+          const hashedKey = await altar.getHash(revealHash)
+          await altar.commitKey(hashedKey)
+          await hre.network.provider.send("evm_mine")
+          await altar.modify(i, 6, revealHash)
+          revealHash = formatBytes32String("yeet")
+          const hashed = await altar.getHash(revealHash)
+          await altar.commitKey(hashed)
+          await hre.network.provider.send("evm_mine")
+          await altar.modify(i, 5, revealHash)
+        } catch (err) {
+          console.log("Error on:", i, err)
+        }
+        const uri = await shdw.tokenURI(i)
+        const json = parseTokenURI(uri)
+        const image = parseImage(json)
+        images.push(image)
+        imageData[i] = json.image
+        log(json)
+      }
+
+      await fs.promises.writeFile("./data.json", JSON.stringify(imageData))
+    })
+
+    it.skip("should claim 50", async function () {
+      let images: string[] = []
+      let imageData: any = {}
+      for (let i = 100; i < 150; i++) {
+        revealHash = formatBytes32String((i * Math.random()).toString())
+        await altar.commitKey(await altar.getHash(revealHash))
+        await hre.network.provider.send("evm_mine")
+        try {
+          await altar.claim(i, revealHash)
         } catch (err) {
           console.log("Error on:", i, err)
         }

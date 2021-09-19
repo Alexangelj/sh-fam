@@ -52,9 +52,6 @@ library Stats {
     /// @notice Returns the attributes of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
     function attributes(uint256 tokenId) internal pure returns (string memory) {
-        string memory output;
-
-        // should we also use components[0] which contains the item name?
         string memory res = trait("Str", strStat(tokenId));
 
         res = string(
@@ -132,10 +129,6 @@ library Stats {
 
         // get 3 highest dice rolls
         uint256 stat = roll1 + roll2 + roll3 + roll4 - min;
-        string memory output = string(
-            abi.encodePacked(keyPrefix, ": ", toString(stat))
-        );
-
-        return output;
+        return toString(stat);
     }
 }
