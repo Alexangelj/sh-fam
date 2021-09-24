@@ -3,7 +3,7 @@ import { task } from "hardhat/config"
 task("verifyAll", "Verifies all contracts").setAction(async (args, hre) => {
   const voidToken = await hre.ethers.getContract("Void")
   const altar = await hre.ethers.getContract("Altar")
-  const shadowling = await hre.ethers.getContract("Shadowling")
+  const shadowling = await hre.ethers.getContract("Shadowlings")
 
   console.log(`\n Verifying void token at: ${voidToken.address}`)
 

@@ -21,12 +21,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
   })
 
-  console.log(`\n Deploying Shadowling`)
-  await deploy("Shadowling", {
+  console.log(`\n Deploying Shadowlings`)
+  await deploy("Shadowlings", {
     from: deployer,
     args: [altar.address],
     log: true,
   })
 }
 export default func
-func.tags = ["Shadowling"]
+func.tags = ["Shadowlings"]

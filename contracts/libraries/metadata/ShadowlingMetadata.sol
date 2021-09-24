@@ -14,12 +14,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 contract ShadowlingMetadata is ERC721Enumerable {
     mapping(uint256 => Attributes.ItemIds) public propertiesOf;
 
-    constructor() ERC721("Shadowling", "SHDW") {}
+    constructor() ERC721("Shadowlings", "SHDW") {}
 
     /// @dev Opensea contract metadata: https://docs.opensea.io/docs/contract-level-metadata
     function contractURI() external pure returns (string memory) {
         string
-            memory json = '{"name": "Shadowling", "description": "Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond..."}';
+            memory json = '{"name": "Shadowlings", "description": "Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond..."}';
         string memory encodedJson = Base64.encode(bytes(json));
         string memory output = string(
             abi.encodePacked("data:application/json;base64,", encodedJson)
@@ -36,18 +36,20 @@ contract ShadowlingMetadata is ERC721Enumerable {
         returns (string memory)
     {
         Attributes.ItemStrings memory props = properties(tokenId);
-        string memory stats = Stats.render(tokenId);
+        string memory svg = string(
+            abi.encodePacked(Attributes.render(props), Stats.render(tokenId))
+        );
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
                         '{ "name": "',
-                        "Shadowling",
+                        "Shadowlings",
                         '", ',
                         '"description" : ',
                         '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        Attributes.render(props, stats),
-                        Attributes.attributes(props)
+                        render(svg),
+                        attributes(tokenId)
                     )
                 )
             )
@@ -59,15 +61,49 @@ contract ShadowlingMetadata is ERC721Enumerable {
         return output;
     }
 
+    function render(string memory attr) public pure returns (string memory) {
+        string[4] memory parts;
+        parts[
+            0
+        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#000026" />';
+
+        parts[1] = attr;
+
+        string memory output = string(abi.encodePacked(parts[0], parts[1]));
+
+        output = string(abi.encodePacked(output, "</svg>"));
+
+        output = string(
+            abi.encodePacked(
+                '"image": "data:image/svg+xml;base64,',
+                Base64.encode(bytes(output)),
+                '", '
+            )
+        );
+
+        return output;
+    }
+
     /// @notice Returns the attributes properties of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
     function attributes(uint256 tokenId) public view returns (string memory) {
-        return Attributes.attributes(properties(tokenId));
+        string memory output;
+
+        string memory res = string(
+            abi.encodePacked("[", Attributes.attributes(properties(tokenId)))
+        );
+
+        res = string(abi.encodePacked(res, ", ", Stats.attributes(tokenId)));
+
+        res = string(abi.encodePacked(res, "]"));
+
+        output = string(abi.encodePacked('"attributes": ', res, "}"));
+        return output;
     }
 
-    /// @notice Returns the attributes properties of a single item
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
     /// @param  itemId A value in propertiesOf[tokenId]
+    /// @return Attributes properties of a single item
     function attributesItem(uint256 itemId)
         public
         pure
@@ -76,6 +112,7 @@ contract ShadowlingMetadata is ERC721Enumerable {
         return Scanner.attributes(itemId);
     }
 
+    /// @return Each item as a string from a Shadowling with `tokenId`
     function properties(uint256 tokenId)
         public
         view

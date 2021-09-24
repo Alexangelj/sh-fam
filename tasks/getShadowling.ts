@@ -22,7 +22,7 @@ task(
 
   console.log(`\n Shadowling: ${tx}`)
 
-  const shadowling = await hre.ethers.getContract("Shadowling", signer)
+  const shadowling = await hre.ethers.getContract("Shadowlings", signer)
   console.log(`Using shadowling at address ${shadowling.address}`)
   try {
     console.log("Getting altar from shadowling")

@@ -2,26 +2,30 @@
 pragma solidity ^0.8.0;
 
 import "../Random.sol";
-import { Base64, toString } from "../MetadataUtils.sol";
+import { Base64, toString, trait } from "../MetadataUtils.sol";
 
 /// @notice Inspired by Andy
 library Stats {
     // ===== Stats in SVG =====
 
+    /// @param tokenId Shadowling tokenId; stats are static to each tokenId
+    /// @return SVG string that renders the stats as text
     function render(uint256 tokenId) internal pure returns (string memory) {
-        string[11] memory stats;
+        string[13] memory stats;
 
-        stats[0] = strStat(tokenId);
-        stats[1] = '</text><text x="10" y="160" class="base">';
-        stats[2] = dexStat(tokenId);
-        stats[3] = '</text><text x="10" y="180" class="base">';
-        stats[4] = conStat(tokenId);
-        stats[5] = '</text><text x="10" y="200" class="base">';
-        stats[6] = intStat(tokenId);
-        stats[7] = '</text><text x="10" y="220" class="base">';
-        stats[8] = wisStat(tokenId);
-        stats[9] = '</text><text x="10" y="240" class="base">';
-        stats[10] = chaStat(tokenId);
+        stats[0] = '<text x="10" y="140" class="base">';
+        stats[1] = strStat(tokenId);
+        stats[2] = '</text><text x="10" y="160" class="base">';
+        stats[3] = dexStat(tokenId);
+        stats[4] = '</text><text x="10" y="180" class="base">';
+        stats[5] = conStat(tokenId);
+        stats[6] = '</text><text x="10" y="200" class="base">';
+        stats[7] = intStat(tokenId);
+        stats[8] = '</text><text x="10" y="220" class="base">';
+        stats[9] = wisStat(tokenId);
+        stats[10] = '</text><text x="10" y="240" class="base">';
+        stats[11] = chaStat(tokenId);
+        stats[12] = "</text>";
 
         string memory output = string(
             abi.encodePacked(
@@ -37,34 +41,66 @@ library Stats {
             )
         );
 
-        output = string(abi.encodePacked(output, stats[9], stats[10]));
+        output = string(
+            abi.encodePacked(output, stats[9], stats[10], stats[11], stats[12])
+        );
         return output;
+    }
+
+    // ===== Attributes =====
+
+    /// @notice Returns the attributes of a `tokenId`
+    /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
+    function attributes(uint256 tokenId) internal pure returns (string memory) {
+        string memory res = trait("Str", strStat(tokenId));
+
+        res = string(
+            abi.encodePacked(res, ", ", trait("Dex", dexStat(tokenId)))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait("Con", conStat(tokenId)))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait("Int", intStat(tokenId)))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait("Wis", wisStat(tokenId)))
+        );
+
+        res = string(
+            abi.encodePacked(res, ", ", trait("Cha", chaStat(tokenId)))
+        );
+
+        return res;
     }
 
     // ===== Individual Stats =====
 
     function strStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "STRENGTH");
+        return pluckStat(tokenId, "Str");
     }
 
     function dexStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "DEXTERITY");
+        return pluckStat(tokenId, "Dex");
     }
 
     function conStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "CONSTITUTION");
+        return pluckStat(tokenId, "Con");
     }
 
     function intStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "INTELLIGENCE");
+        return pluckStat(tokenId, "Int");
     }
 
     function wisStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "WISDOM");
+        return pluckStat(tokenId, "Wis");
     }
 
     function chaStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "CHARISMA");
+        return pluckStat(tokenId, "Cha");
     }
 
     // ===== Roll Stat =====
@@ -93,10 +129,6 @@ library Stats {
 
         // get 3 highest dice rolls
         uint256 stat = roll1 + roll2 + roll3 + roll4 - min;
-        string memory output = string(
-            abi.encodePacked(keyPrefix, ": ", toString(stat))
-        );
-
-        return output;
+        return toString(stat);
     }
 }

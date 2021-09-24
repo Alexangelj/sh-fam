@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract Void is ERC20Votes, Ownable, ReentrancyGuard {
     /// @notice Minter contract for Void tokens
-    address public altar;
+    address public immutable altar;
 
     function mint(address to, uint256 value) external onlyOwner {
         _mint(to, value);

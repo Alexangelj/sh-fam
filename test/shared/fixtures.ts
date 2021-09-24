@@ -5,7 +5,7 @@ const overrides = { gasLimit: 12500000 }
 
 import Altar from "../../artifacts/contracts/Altar.sol/Altar.json"
 import Void from "../../artifacts/contracts/Void.sol/Void.json"
-import Shadowling from "../../artifacts/contracts/Shadowling.sol/Shadowling.json"
+import Shadowlings from "../../artifacts/contracts/Shadowlings.sol/Shadowlings.json"
 
 export interface ShadowFixture {
   altar: Contract
@@ -25,14 +25,13 @@ export async function shadowFixture(
   const token = await deployContract(wallet, Void, [altar.address], overrides)
   const shdw = await deployContract(
     wallet,
-    Shadowling,
+    Shadowlings,
     [altar.address],
     overrides
   )
 
   // sets the new contracts in the altar
-  await altar.setVoid(token.address)
-  await altar.setShadowling(shdw.address)
+  await altar.initialize(token.address, shdw.address)
 
   let mock721 = await (await ethers.getContractFactory("MockERC721")).deploy()
   let mock1155 = await (await ethers.getContractFactory("MockERC1155")).deploy()

@@ -23,32 +23,25 @@ task("setup", "Initializes state of altar").setAction(async (args, hre) => {
   const altar = await hre.ethers.getContract("Altar", signer)
   console.log(`    - Using Altar at address: ${altar.address}`)
 
-  const shadowling = await hre.ethers.getContract("Shadowling", signer)
+  const shadowling = await hre.ethers.getContract("Shadowlings", signer)
   console.log(`    - Using Shadowling at address: ${shadowling.address}`)
 
+  // initialize the contract
   // set the void token in the altar
   let voidAddress = await altar.void()
-  if (voidAddress == AddressZero) {
+  // set the shadowling contract in the altar
+  let shadowlingAddress = await altar.shadowling()
+  if (voidAddress == AddressZero && shadowlingAddress == AddressZero) {
     console.log(
       `\n Setting void token address in altar to ${voidToken.address}`
     )
-    await altar.setVoid(voidToken.address)
-    voidAddress = await altar.void()
-  }
-
-  // set the shadowling contract in the altar
-  let shadowlingAddress = await altar.shadowling()
-  if (shadowlingAddress == AddressZero) {
     console.log(
       `\n Setting shadowling address in altar to ${shadowling.address}`
     )
-    await altar.setShadowling(shadowling.address)
+    await altar.initialize(voidToken.address, shadowling.address)
+    voidAddress = await altar.void()
     shadowlingAddress = await altar.shadowling()
   }
-
-  // set the cost to mint a shadowling in void tokens
-  await altar.setShadowlingCost(SHADOWLING_COST)
-  console.log(`   - Set Shadowling cost to: ${SHADOWLING_COST}`)
 
   // for each currency type, set its cost in void tokens
   for (let i = 2; i < 9; i++) {

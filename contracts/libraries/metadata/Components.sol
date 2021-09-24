@@ -12,117 +12,119 @@ library Components {
     using strings for strings.slice;
 
     string internal constant suffixes =
-        "of Borrowed Souls,of Synthetics,of Yield, of Qua'Driga,of Liquidation Pools,of Power,of Giants,of Titans,of Skill,of Perfection,of Brilliance,of Enlightenment,of Protection,of Anger,of Rage,of Fury,of Vitriol,of the Fox,of Detection,of Reflection,of the Twins";
-    uint256 constant suffixesLength = 21;
+        "of Borrowed Souls,of Synthetics,of Yield,of Qua'Driga,of Liquidation Pools,of Asteroids,of Atoms,of Betelgeuse,of Celestial,of the Cosmics,of Cybernetics,of Dark Nebulas,of Dopplers,of Electromagnetism,of the Elements,of Meta,of the Hyperscape,of Mars,of Parallax,of Zenith,of Judgement,of Technology,of Hyperspace,of Cyberspace";
+    uint256 constant suffixesLength = 24;
 
     string internal constant namePrefixes =
-        "Balthazar,NoGm,The Larp,The Rugged,The Doxxed,The Simp,The Meme,The Top buyer,The Bottom seller,The Moon,The Oracle,Agony,Apocalypse,Armageddon,Beast,Behemoth,Blight,Blood,Bramble,Brimstone,Brood,Carrion,Cataclysm,Chimeric,Corpse,Corruption,Damnation,Death,Demon,Dire,Dragon,Dread,Doom,Dusk,Eagle,Empyrean,Fate,Foe,Gale,Ghoul,Gloom,Glyph,Golem,Grim,Hate,Havoc,Honour,Horror,Hypnotic,Kraken,Loath,Maelstrom,Mind,Miracle,Morbid,Oblivion,Onslaught,Pain,Pandemonium,Phoenix,Plague,Rage,Rapture,Rune,Skull,Sol,Soul,Sorrow,Spirit,Storm,Tempest,Torment,Vengeance,Victory,Viper,Vortex,Woe,Wrath,Light's,Shimmering";
-    uint256 constant namePrefixesLength = 80;
+        "Balthazar,Larp,Rugged,Doxxed,Simp,Meme,Moon,Oracle,Astrogate,Android,Blaster,Cloaking,Continuum,Cyborg,Death Ray,Disintegrator,Earthborn,Digital,Force,Genetic,Holographic,Hyperdrive,Ionic,Jump,Light Speed,Martian,Mech,Matrix,Multiversal,Nebula,Null,Outerworld,Phase,Replicant,Machine,Shield,Space,Starbase,Paradox,Time,Ultraviolet,Fusion,Zero,Quantum,Artificial,Intelligent";
+    uint256 constant namePrefixesLength = 46;
 
     string internal constant nameSuffixes =
-        "Nocoiner,Maximus,Ngmi,Degen,Black Hat,White Hat,All-In,Apesbane,Bearsbane,Minimaxi,Bridgecrosser,Bridgeburner,Goldman,Bane,Root,Bite,Song,Roar,Grasp,Instrument,Glow,Bender,Shadow,Whisper,Shout,Growl,Tear,Peak,Form,Sun,Moon";
-    uint256 constant nameSuffixesLength = 31;
+        "Nocoiner,Maximus,Degen,All-In,Apesbane,Bearsbane,Minimaxi,Bridgecrosser,Bridgeburner,Goldman,Beam,Comlink,Cyberpunk,Dimensional,Disruptor,Dystopian,Nomadic,Scan,Galactic,Gravity,Humanoid,Hyperspeed,Interplanetary,Laser,Lunar,Matter,Mercurial,Morphic,Mutant,Nova,Orbital,Parallel,Ray,Robot,Sapient,Sol,Pirate,Temporal,Terra,Warp,Uranium,Worm,Xeno";
+    uint256 constant nameSuffixesLength = 43;
 
     string internal constant creatures =
-        "None,Twisted Memwraith,Hashenhorror,Shadow Wen,Bear Ape,Moon Wolf,Size Lorde,Degendragon,GM Doge,Lite Llama,Yearning Nymph,Crvaceous Snake,Holovyper,Wailing Integer,Craaven Defaulter,Floating Eyes of Sec,Byzantine Princesss,Manbearpig,Larping Terror,T-Rekt,Defi-ant ,Ropsten Whale,Llama,Enchanted Rug,Blind Oracle,Gwei Accountant,Lazarus Cotten,Mempool Wraith,Pernicious penguins,Seed Stalker,Snark,Shadowswapper,Ravage 0xxl,Market Rat,Dread Dip Dog,Axallaxxa,Fragmented Cobielodon,Jomoeon,Umbramystics,Pepboi,Cypher Ghouls,Censor Vines,Tormented Gorgon,Sushi Kraken,Alpha-eating Ooze,Blathering Kirby,Rinkeby Raider,Smol banteg";
-    uint256 internal constant creaturesLength = 47;
+        "None,Twisted Memwraith,Hashenhorror,Shadow Wen,Bear Ape,Moon Wolf,Size Lorde,Degendragon,GM Doge,Lite Llama,Yearning Nymph,Crvaceous Snake,Holovyper,Wailing Integer,Craaven Defaulter,Byzantine Princesss,Manbearpig,Larping Terror,T-Rekt,Defi-ant,Ropsten Whale,Llama,Enchanted Rug,Blind Oracle,Gwei Accountant,Lazarus Cotten,Mempool Wraith,Pernicious Penguin,Seed Stalker,Snark,Shadowswapper,Ravage 0xxl,Market Rat,Dread Dip Dog,Axallaxxa,Fragmented Cobielodon,Jomoeon,Umbramystics,Pepboi,Cypher Ghouls,Censor Vines,Tormented Gorgon,Sushi Kraken,Alpha-eating Ooze,Kirby,Rinkeby Raider,Smol banteg,Blockworm,Metaworm";
+    uint256 internal constant creaturesLength = 49;
 
-    string internal constant flaws =
-        "Rugged ,Doxxed,Liquidated,Waifu simp,Exploited,Paper hands,Flash Loaned,UTXO,Theorist,NGMI,Mid IQ,Copy Trader,Larper,Floor seller,Goxxed,Oyster Forked,Chad Bro,Exit Liquidity,Hacked,Failed Transaction";
-    uint256 internal constant flawsLength = 20;
+    string internal constant items =
+        "Cybernetic Arm,Cybernetic Eye,Cybernetic Leg,Cybernetic Chest,Cybernetic Foot,Plasma Rifle,Blue Pill,Red Pill,A Block,Cloaking Device,Transporter,Bridge Key,Digital Land,Metawallet,Orb of Protection,Coin,Deck of Cards,Gas,Godblood,Memfruit,Calldata,Event Data,Transaction Data,Metadata,Royalties,Killswitch,Private Key,Cyberknife,Vial of Corruption,Vial of Regeneration,Meta Planet,Meta Golf Course,Meta Tower,Meta Skyscaper,Meta Race Track,Key to the City,Extra Life,Pocket Vehicle,Meta Apartment,Meta House,Meta Company,Divine Bodysuit,Phase Katana,Orb of Summoning,Bottomless Bag,Hoverboard,Merkle Root,Ancient Tattoo";
+    uint256 internal constant itemsLength = 48;
 
     string internal constant origins =
-        "Shadowkain's Domain,Kulechovs Dominion ,Perilous Farms,Oceans of Degen Tears,Dark Forest,Mempool,Shadowchain,Polygonal Meshspace,Lands of Arbitrary Optimism,Chainspace,Chains of Nazarov,Blue Lagoon,Swamp,Genesis Cube";
-    uint256 internal constant originsLength = 14;
+        "Shadowkain's Domain,Kulechovs Dominion ,Perilous Farms,Dark Forest,Mempool,Shadowchain,Polygonal Meshspace,Lands of Arbitrum,Chainspace,Chains of Nazarov,Blue Lagoon,Swamp,Genesis Cube,Lands of Optimism,Ether Chain,Outerblocks";
+    uint256 internal constant originsLength = 16;
 
     string internal constant bloodlines =
-        "O,Wokr,Vmew,Kali-Zui,Zaphthrot,Luban,Yu-Koth,Sturrosh,Ia-Ngai,Khakh,Gyathna,Huacas,Zhar & Lloigor,Xl-rho,Shudde Mell,Crethagu,Unsca Norna,Phvithvre,Yorae,Ydheut,Pa'ch,Waarza,Chhnghu,Shi-Yvgaa,Ximayya Xan,l'Totoxl,Wakan,Ythogtha,Ub-ji,Shuaicha,Sthuma,Senne'll,Xyngogtha";
-    //"QmTWXhdXKcw6RXhKPcBhWVmj12wRLvYcgrSpT1nikmBtGv,QmfJsL7Lh2jrRqaTMxorT7qRuMuDSW7jLMb2vQuyMhHokk,QmdcDCzGVTo2VPwj1haCuPoop5SkC9BFroXU4aw9Hza67e,QmenTr74f5Hn5SkJT1NTEFWSaT49F8fi2onT146UwgdshR,QmfVgziuVbPovhQqKgW8J3DQYRieQx9PmHNSe4yUbZYT4W,QmSXxRgxn2hevEDXDw1KPMNpBrTxGAZXAbfCsXRbKQ7FNR,QmYD8wuKLojhuR7VyJTBxEwFjpTFQciLU5QmKfD1k4SeVF,QmPEgBRK6wGhCkKPwAw9j2Na86cp77fmjtMVfT5V4VYWpQ,QmWuHooTjwnDZw4CS58bUWwoSUP9PMjp3vxN3Rmkc3JDU2,QmWhZ9rYPU7S5hkGv4gXQuqMu85Z87oWK1f3hCFK2T9fbD,QmSmxeYAQsHeV5cY75ijruASZ4HpG64SskdTLVYUzBmJUm,Qmbje3tHZNXnCYz3mfzFxQ2ZzpXNYtwWRCoviLC29euWud,QmR7VG4etp7ueP1yoFw7uaZGCLckcf4qhkbTaTK5C8Wd2E,QmPRDQX7GekyKsispCZKJ4cRLxwhVBN3TbWEAqMLPZvqec,QmRwUvuDja6Ss2NNKUnBqsJhHaDMNyW6FdzzSVG77ACcaz,QmcTZRpjWd9b4FkPSR5bGwx3r5cko9jqks5H5b81rjCjLp,QmV3Pbskd7D4DPmseyojXo4E8uzm6rbiPASh6b2TpU38n4,QmWYFJDqDuDrKikgAJj45Mr5gQ37dPywK6D5giFerT3oVG,QmavyWUXwnpvgMHad2pXkALe1WHq9pJatFkqW67p7Nv5Jm,QmSwu6wHHHu8DYXZB9HXRpc2mnrAUYFQbbLHmzMgxxEKZq,QmQJitWq2HjuBsrfm5W4zzsAowe5agM2pbeDg5a43Fh2cv,QmPCGrxrJ77VRzCMpmgFszFx9Ky2FXhHrNKtv8kfBA276Y,QmeenofHLBmbPDvh6bf9pDwXXtuerGunDLYRjpurmV3qt2,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,QmXpXZWi7PQdZuYg1aBr8oDbgaVmSXY2D1rRDnjQ8Ax5zK,Qmc3DYKkQX9tXfy4c5qzc6KKKSUYu1iEwZRNkZpgXRNTsR,QmVQ1VjppWsuspouBKNB73Wk1K1U273zVAwJPuW8aEKK9N,QmSR9pWx9wHaD4tTyJrjGYrYkYwvBcBYieGqnhzwEJfHo1,Qmb3ZVTSX4bHR7WaRVeupnnnZ9wvov9HHA4zdpZVL8hcyi,QmUm6BeTkSu8brGG1ZwXENBuUihPGLX79whA9t1ZrKhjkQ,QmPcfHotn4MCtuMk5HnPSTEr2jjaonoGUZBNM9zs8Y9X9S,QmPCTkdEAsALUYQcdbmpbZrgCSMfgX9x7UsVFqtGCEn7JN,QmdUwtdf3UwZhPcWi1Qw1DPoANdPcdPZQSz95tpc8sSX5w";
+        "O,Wokr,Vmew,Kali-Zui,Zaphthrot,Luban,Yu-Koth,Sturrosh,Ia-Ngai,Khakh,Gyathna,Huacas,Zhar and Lloigor,Xl-rho,Shudde Mell,Crethagu,Unsca Norna,Phvithvre,Yorae,Ydheut,Pa'ch,Waarza,Chhnghu,Shi-Yvgaa,Ximayya Xan,l'Totoxl,Wakan,Ythogtha,Ub-ji,Shuaicha,Sthuma,Senne'll,Xyngogtha";
     uint256 internal constant bloodlinesLength = 33;
 
-    string internal constant abilities =
-        "3'3,Shitposting,Diamond Bull Horns,Masternode,Front Running,MEV Collector,NFT Flipper,Artblocks connoisseur ,Diamond hands,Free transactions,Perma Low Gas Fees,Made it ,Flash Bundler,Private relays,Compounding,Galaxy Brain,Low IQ,High IQ";
-    uint256 internal constant abilitiesLength = 18;
+    string internal constant perks =
+        "3'3,Shitposting,Diamond Bull Horns,Masternode,Front Running,MEV Collector,NFT Flipper,Artblocks Connoisseur ,Diamond Hands,Free Transactions,Made It ,Flash Bundler,Private Relays,Compounding,Galaxy Brain,Low IQ,High IQ,Rugged,Doxxed,Liquidated,Waifu Simp,Exploited,Paper Hands,Flash Loaned,UTXO,Theorist,NGMI,Mid IQ,Copy Trader,Larper,Floor seller,Goxxed,Oyster Forked,Chad Bro,Exit Liquidity,Hacked,Failed Transaction,Black Hat,White Hat,Zero Knowledge";
+    uint256 internal constant perksLength = 40;
 
     string internal constant names =
-        "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
-    uint256 internal constant namesLength = 186;
+        "Satoshi,Vitalik,Vlad,Adam,Ailmar,Darfin,Jhaan,Zabbas,Neldor,Gandor,Bellas,Daealla,Nym,Vesryn,Angor,Gogu,Malok,Rotnam,Chalia,Astra,Fabien,Orion,Quintus,Remus,Rorik,Sirius,Sybella,Azura,Dorath,Freya,Ophelia,Yvanna,Zeniya,James,Robert,John,Michael,William,David,Richard,Joseph,Thomas,Charles,Mary,Patricia,Jennifer,Linda,Elizabeth,Kwisatz,Barbara,Susan,Jessica,Sarah,Karen,Dilibe,Eva,Matthew,Bolethe,Polycarp,Ambrogino,Jiri,Chukwuebuka,Chinonyelum,Mikael,Mira,Aniela,Samuel,Isak,Archibaldo,Chinyelu,Kerstin,Abigail,Olympia,Grace,Nahum,Elisabeth,Serge,Sugako,Patrick,Florus,Svatava,Ilona,Lachlan,Caspian,Filippa,Paulo,Darda,Linda,Gradasso,Carly,Jens,Betty,Ebony,Dennis,Martin Davorin,Laura,Jesper,Remy,Onyekachukwu,Jan,Dioscoro,Hilarij,Rosvita,Noah,Patrick,Mohammed,Chinwemma,Raff,Aron,Miguel,Dzemail,Gawel,Gustave,Efraim,Adelbert,Jody,Mackenzie,Victoria,Selam,Jenci,Ulrich,Chishou,Domonkos,Stanislaus,Fortinbras,George,Daniel,Annabelle,Shunichi,Bogdan,Anastazja,Marcus,Monica,Martin,Yuukou,Harriet,Geoffrey,Jonas,Dennis,Hana,Abdelhak,Ravil,Patrick,Karl,Eve,Csilla,Isabella,Radim,Thomas,Faina,Rasmus,Alma,Charles,Chad,Zefram,Hayden,Joseph,Andre,Irene,Molly,Cindy,Su,Stani,Ed,Janet,Cathy,Kyle,Zaki,Belle,Bella,Jessica,Amou,Steven,Olgu,Eva,Ivan,Vllad,Helga,Anya,John,Rita,Evan,Jason,Donald,Tyler,Changpeng,Sam";
+    uint256 internal constant namesLength = 187;
 
     // ===== Components ====
 
-    function creatureComponents(uint256 tokenId)
+    function creatureComponents(uint256 seed)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "CREATURE", creaturesLength);
+        return pluck(seed, "CREATURE", creaturesLength);
     }
 
-    function flawComponents(uint256 tokenId)
+    function itemComponents(uint256 seed)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "FLAW", flawsLength);
+        return pluck(seed, "ITEM", itemsLength);
     }
 
-    function originComponents(uint256 tokenId, bool shadowChain)
+    function originComponents(uint256 seed, bool shadowChain)
         internal
         pure
         returns (uint256[5] memory)
     {
-        if (shadowChain) return pluck(tokenId, "ORIGIN", 5);
-        return pluck(tokenId, "ORIGIN", originsLength);
+        if (shadowChain) return pluck(seed, "ORIGIN", 5);
+        return pluck(seed, "ORIGIN", originsLength);
     }
 
-    function bloodlineComponents(uint256 tokenId)
+    function bloodlineComponents(uint256 seed)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "BLOODLINE", bloodlinesLength);
+        return pluck(seed, "BLOODLINE", bloodlinesLength);
     }
 
-    function abilityComponents(uint256 tokenId)
+    function perkComponents(uint256 seed)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "ABILITY", abilitiesLength);
+        return pluck(seed, "PERK", perksLength);
     }
 
-    function nameComponents(uint256 tokenId)
+    function nameComponents(uint256 seed)
         internal
         pure
         returns (uint256[5] memory)
     {
-        return pluck(tokenId, "NAME", namesLength);
+        return pluck(seed, "NAME", namesLength);
     }
 
     // ===== Pluck Index Numbers of Raw Materials =====
 
+    /// @notice Uses seed value to get a component
+    /// @param seed Pseudorandom number from commit-reveal scheme
+    /// @param keyPrefix Type of item being plucked, hashed together with seed
+    /// @param sourceCSVLength Length of the array of values
+    /// @return New array of values which act as index numbers for respective string csv arrays
     function pluck(
-        uint256 tokenId,
+        uint256 seed,
         string memory keyPrefix,
         uint256 sourceCSVLength
     ) internal pure returns (uint256[5] memory) {
         uint256[5] memory components;
 
-        uint256 rand = Random.random(
-            string(abi.encodePacked(keyPrefix, toString(tokenId)))
-        );
+        seed = uint256(keccak256(abi.encodePacked(keyPrefix, seed)));
 
-        components[0] = rand % sourceCSVLength;
+        components[0] = seed % sourceCSVLength;
         components[1] = 0;
         components[2] = 0;
 
-        uint256 greatness = rand % 21;
+        uint256 greatness = seed % 21;
         if (greatness > 14) {
-            components[1] = (rand % suffixesLength) + 1;
+            components[1] = (seed % suffixesLength) + 1;
         }
         if (greatness >= 19) {
-            components[2] = (rand % namePrefixesLength) + 1;
-            components[3] = (rand % nameSuffixesLength) + 1;
+            components[2] = (seed % namePrefixesLength) + 1;
+            components[3] = (seed % nameSuffixesLength) + 1;
             if (greatness == 19) {
                 // ...
             } else {
