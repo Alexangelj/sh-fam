@@ -6,8 +6,6 @@ import "@nomiclabs/hardhat-ethers"
 import "@nomiclabs/hardhat-etherscan"
 import { HardhatUserConfig } from "hardhat/config"
 import "./tasks/claim"
-import "./tasks/dropKeys"
-import "./tasks/generateKeys"
 import "./tasks/getShadowling"
 import "./tasks/setBaseCost"
 import "./tasks/setCurrencyCost"
@@ -89,5 +87,8 @@ export default {
     deployer: {
       default: 0, // first account
     },
+  },
+  contractSizer: {
+    runOnCompile: true,
   },
 }

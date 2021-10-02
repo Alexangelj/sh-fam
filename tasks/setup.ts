@@ -1,10 +1,5 @@
 import { task } from "hardhat/config"
-import {
-  BASE_COSTS,
-  CURRENCY_COSTS,
-  PREMIUM_COSTS,
-  SHADOWLING_COST,
-} from "../scripts/constants"
+import { BASE_COSTS, CURRENCY_COSTS, PREMIUM_COSTS } from "../scripts/constants"
 import { AddressZero } from "@ethersproject/constants"
 
 task("setup", "Initializes state of altar").setAction(async (args, hre) => {
