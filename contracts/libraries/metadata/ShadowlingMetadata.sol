@@ -90,12 +90,14 @@ contract ShadowlingMetadata is ERC721Enumerable {
         string memory output;
 
         string memory res = string(
-            abi.encodePacked("[", Attributes.attributes(properties(tokenId)))
+            abi.encodePacked(
+                "[",
+                Attributes.attributes(properties(tokenId)),
+                ", ",
+                Stats.attributes(tokenId),
+                "]"
+            )
         );
-
-        res = string(abi.encodePacked(res, ", ", Stats.attributes(tokenId)));
-
-        res = string(abi.encodePacked(res, "]"));
 
         output = string(abi.encodePacked('"attributes": ', res, "}"));
         return output;

@@ -6,6 +6,13 @@ import { Base64, toString, trait } from "../MetadataUtils.sol";
 
 /// @notice Inspired by Andy
 library Stats {
+    string internal constant STR = "Sr";
+    string internal constant DEX = "Dex";
+    string internal constant CON = "Con";
+    string internal constant INT = "Int";
+    string internal constant WIS = "Wis";
+    string internal constant CHA = "Cha";
+
     // ===== Stats in SVG =====
 
     /// @param tokenId Shadowling tokenId; stats are static to each tokenId
@@ -52,26 +59,20 @@ library Stats {
     /// @notice Returns the attributes of a `tokenId`
     /// @dev Opensea Standards: https://docs.opensea.io/docs/metadata-standards
     function attributes(uint256 tokenId) internal pure returns (string memory) {
-        string memory res = trait("Str", strStat(tokenId));
-
-        res = string(
-            abi.encodePacked(res, ", ", trait("Dex", dexStat(tokenId)))
-        );
-
-        res = string(
-            abi.encodePacked(res, ", ", trait("Con", conStat(tokenId)))
-        );
-
-        res = string(
-            abi.encodePacked(res, ", ", trait("Int", intStat(tokenId)))
-        );
-
-        res = string(
-            abi.encodePacked(res, ", ", trait("Wis", wisStat(tokenId)))
-        );
-
-        res = string(
-            abi.encodePacked(res, ", ", trait("Cha", chaStat(tokenId)))
+        string memory res = string(
+            abi.encodePacked(
+                trait(STR, strStat(tokenId)),
+                ", ",
+                trait(DEX, dexStat(tokenId)),
+                ", ",
+                trait(CON, conStat(tokenId)),
+                ", ",
+                trait(INT, intStat(tokenId)),
+                ", ",
+                trait(WIS, wisStat(tokenId)),
+                ", ",
+                trait(CHA, chaStat(tokenId))
+            )
         );
 
         return res;
@@ -80,27 +81,27 @@ library Stats {
     // ===== Individual Stats =====
 
     function strStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Str");
+        return pluckStat(tokenId, STR);
     }
 
     function dexStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Dex");
+        return pluckStat(tokenId, DEX);
     }
 
     function conStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Con");
+        return pluckStat(tokenId, CON);
     }
 
     function intStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Int");
+        return pluckStat(tokenId, INT);
     }
 
     function wisStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Wis");
+        return pluckStat(tokenId, WIS);
     }
 
     function chaStat(uint256 tokenId) internal pure returns (string memory) {
-        return pluckStat(tokenId, "Cha");
+        return pluckStat(tokenId, CHA);
     }
 
     // ===== Roll Stat =====

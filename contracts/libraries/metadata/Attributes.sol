@@ -117,43 +117,17 @@ library Attributes {
         pure
         returns (string memory)
     {
-        string memory res = trait(Scanner.getItemType(0), items.creature);
-
-        res = string(
+        string memory res = string(
             abi.encodePacked(
-                res,
+                trait(Scanner.getItemType(0), items.creature),
                 ", ",
-                trait(Scanner.getItemType(1), items.item)
-            )
-        );
-
-        res = string(
-            abi.encodePacked(
-                res,
+                trait(Scanner.getItemType(1), items.item),
                 ", ",
-                trait(Scanner.getItemType(2), items.origin)
-            )
-        );
-
-        res = string(
-            abi.encodePacked(
-                res,
+                trait(Scanner.getItemType(2), items.origin),
                 ", ",
-                trait(Scanner.getItemType(3), items.bloodline)
-            )
-        );
-
-        res = string(
-            abi.encodePacked(
-                res,
+                trait(Scanner.getItemType(3), items.bloodline),
                 ", ",
-                trait(Scanner.getItemType(4), items.perk)
-            )
-        );
-
-        res = string(
-            abi.encodePacked(
-                res,
+                trait(Scanner.getItemType(4), items.perk),
                 ", ",
                 trait(Scanner.getItemType(5), items.name)
             )
