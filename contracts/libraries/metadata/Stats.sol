@@ -6,7 +6,7 @@ import { Base64, toString, trait } from "../MetadataUtils.sol";
 
 /// @notice Inspired by Andy
 library Stats {
-    string internal constant STR = "Sr";
+    string internal constant STR = "Str";
     string internal constant DEX = "Dex";
     string internal constant CON = "Con";
     string internal constant INT = "Int";

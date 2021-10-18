@@ -116,10 +116,10 @@ describe("Shadowlings", function () {
       log(json)
     })
 
-    it("should modify traits of 50", async function () {
+    it.only("should modify traits of 10", async function () {
       let images: string[] = []
       let imageData: any = {}
-      for (let i = 100; i < 150; i++) {
+      for (let i = 100; i < 110; i++) {
         revealHash = formatBytes32String((i * Math.random()).toString())
         await altar.commitKey(await altar.getHash(revealHash))
         await hre.network.provider.send("evm_mine")

@@ -6,6 +6,7 @@ const overrides = { gasLimit: 12500000 }
 import Altar from "../../artifacts/contracts/Altar.sol/Altar.json"
 import Void from "../../artifacts/contracts/Void.sol/Void.json"
 import Shadowlings from "../../artifacts/contracts/Shadowlings.sol/Shadowlings.json"
+import SymbolsAbi from "../../artifacts/contracts/libraries/metadata/Symbols.sol/Symbols.json"
 
 export interface ShadowFixture {
   altar: Contract
@@ -23,13 +24,30 @@ export async function shadowFixture(
   const altar = await deployContract(wallet, Altar, [], overrides)
   // deploys dependency contracts with altar as the constructor arg
   const token = await deployContract(wallet, Void, [altar.address], overrides)
+
+  const symbols = await (await ethers.getContractFactory("Symbols")).deploy()
+  const shdw = await (
+    await ethers.getContractFactory("Shadowlings", {
+      signer: wallet,
+      libraries: { Symbols: symbols.address },
+    })
+  ).deploy(altar.address)
+  /* const symbols = await deployContract(wallet, SymbolsAbi, [])
+  let SymbolsLibrary = {
+    evm: { bytecode: { object: SymbolsAbi.bytecode } },
+  }
+  link(
+    SymbolsLibrary,
+    "contracts/libraries/metadata/Symbols.sol:Symbols",
+    symbols.address
+  )
   const shdw = await deployContract(
     wallet,
     Shadowlings,
     [altar.address],
     overrides
   )
-
+ */
   // sets the new contracts in the altar
   await altar.initialize(token.address, shdw.address)
 

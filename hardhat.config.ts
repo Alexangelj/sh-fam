@@ -30,6 +30,7 @@ export default {
   networks: {
     hardhat: {
       hardfork: "london",
+      allowUnlimitedContractSize: true,
     },
     kovan: {
       accounts: [DEPLOYER_KEY],
