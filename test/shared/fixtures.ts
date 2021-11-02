@@ -25,7 +25,14 @@ export async function shadowFixture(
   // deploys dependency contracts with altar as the constructor arg
   const token = await deployContract(wallet, Void, [altar.address], overrides)
 
-  const symbols = await (await ethers.getContractFactory("Symbols")).deploy()
+  const symbolStoreCenter = await (await ethers.getContractFactory("SymbolStoreCenter")).deploy()
+  const symbolStoreOuter = await (await ethers.getContractFactory("SymbolStoreOuter")).deploy()
+  const symbols = await (await ethers.getContractFactory("Symbols", {
+    libraries: { 
+      SymbolStoreCenter: symbolStoreCenter.address,
+      SymbolStoreOuter: symbolStoreOuter.address,
+    }
+  })).deploy()
   const shdw = await (
     await ethers.getContractFactory("Shadowlings", {
       signer: wallet,

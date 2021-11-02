@@ -61,32 +61,31 @@ library Attributes {
         pure
         returns (string memory)
     {
-        string[13] memory parts;
-        parts[0] = '<text x="10" y="20" class="base">';
+        string[12] memory parts;
 
-        parts[1] = item.creature;
+        parts[0] = item.creature;
 
-        parts[2] = '</text><text x="10" y="40" class="base">';
+        parts[1] = ' \u06DE ';
 
-        parts[3] = item.item;
+        parts[2] = item.item;
 
-        parts[4] = '</text><text x="10" y="60" class="base">';
+        parts[3] = ' \u06DE ';
 
-        parts[5] = item.origin;
+        parts[4] = item.origin;
 
-        parts[6] = '</text><text x="10" y="80" class="base">';
+        parts[5] = ' \u06DE ';
 
-        parts[7] = item.bloodline;
+        parts[6] = item.bloodline;
 
-        parts[8] = '</text><text x="10" y="100" class="base">';
+        parts[7] = ' \u06DE ';
 
-        parts[9] = item.perk;
+        parts[8] = item.perk;
 
-        parts[10] = '</text><text x="10" y="120" class="base">';
+        parts[9] = ' \u06DE ';
 
-        parts[11] = item.name;
+        parts[10] = item.name;
 
-        parts[12] = "</text>";
+        parts[11] = " \u06DE ";
 
         string memory output = string(
             abi.encodePacked(
@@ -103,7 +102,22 @@ library Attributes {
         );
 
         output = string(
-            abi.encodePacked(output, parts[9], parts[10], parts[11], parts[12])
+            abi.encodePacked(
+                output,
+                parts[9],
+                parts[10],
+                parts[11]
+            )
+        );
+
+        output = string(
+            abi.encodePacked(
+                '<path id="text-path" fill="none" d="M250 250 m-180,0 a 180 180 0 1 1 360 0 a 180,180 0 1,1 -360,0"/><text text-rendering="optimizeSpeed" class="base"><textPath startOffset="0%" textLength="1120" method="stretch" href="#text-path">',
+                output,
+                '<animate additive="sum" attributeName="startOffset" from="100%" to="0%" begin="0s" dur="45s" repeatCount="indefinite"/></textPath><textPath startOffset="-100%" textLength="1120" method="stretch" href="#text-path">',
+                output,
+                '<animate additive="sum" attributeName="startOffset" from="100%" to="0%" begin="0s" dur="45s" repeatCount="indefinite" /></textPath></text>'
+            )
         );
         return output;
     }
