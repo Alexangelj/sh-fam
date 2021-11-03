@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.8.0;
 
+import "./Attributes.sol";
 import { toString } from "../MetadataUtils.sol";
 import "./SymbolStoreCenter.sol";
 import "./SymbolStoreOuter.sol";
@@ -11,13 +12,13 @@ library Symbols {
     uint32 y;
   }
 
-  function render(uint256 tokenId)
+  function render(Attributes.ItemStrings memory item)
     public 
     pure 
     returns (string memory) 
   {
     string[8] memory parts;
-    uint256 count = Symbols.outerSymbolCount(tokenId);
+    uint256 count = Symbols.outerSymbolCount(item.bloodline);
 
     uint16[6] memory circle_x;
     uint16[6] memory circle_y;
@@ -44,6 +45,15 @@ library Symbols {
       );
     }
 
+    string[6] memory traits = [
+      item.name,
+      item.perk,
+      item.origin,
+      item.item,
+      item.creature,
+      item.bloodline
+    ];
+
     for (uint i = 0; i < count; i++) {
       parts[4] = string(
         abi.encodePacked(
@@ -53,8 +63,14 @@ library Symbols {
           ',',
           toString(symbol_y[i]),
           ') scale(0.03)">',
-          pluckOuterSymbol(tokenId,i),
-          '</g><animateTransform attributeName="transform" type="rotate" from="360 ',
+          pluckOuterSymbol(traits[i]),
+          '</g><animateTransform attributeName="transform" type="rotate" from="360 '
+        )
+      );
+
+      parts[4] = string(
+        abi.encodePacked(
+          parts[4],
           toString(circle_x[i]),
           ' ',
           toString(circle_y[i]),
@@ -69,7 +85,7 @@ library Symbols {
 
     parts[5] = '<animateTransform attributeName="transform" type="rotate" from="0 250 250" to="360 250 250" dur="60s" repeatCount="indefinite"/></g><g  fill="white" transform="scale(0.15) translate(400, 400)" filter="url(#displacementFilter)">';
 
-    parts[6] = pluckCentralSymbol(tokenId);
+    parts[6] = pluckCentralSymbol(item.creature);
     parts[7] = "</g>";
 
     string memory output = string(
@@ -88,32 +104,32 @@ library Symbols {
     return output;
   }
 
-  function outerSymbolCount(uint256 tokenId)
+  function outerSymbolCount(string memory bloodline)
     internal
     pure
     returns (uint256)
   {
-    uint256 numSymbols = (uint256(keccak256(abi.encodePacked("outer", tokenId))) % 4) + 3;
+    uint256 numSymbols = (uint256(keccak256(abi.encodePacked(bloodline))) % 4) + 3;
 
     return numSymbols;
   }
 
-  function pluckCentralSymbol(uint256 tokenId)
+  function pluckCentralSymbol(string memory creature)
     internal
     pure
     returns (string memory)
   {
-    uint256 rndIndex = (uint256(keccak256(abi.encodePacked("central", tokenId))) % 8) + 1;
+    uint256 rndIndex = (uint256(keccak256(abi.encodePacked(creature))) % 8) + 1;
 
     return SymbolStoreCenter.getSymbol(rndIndex);
   }
 
-  function pluckOuterSymbol(uint256 tokenId, uint256 index)
+  function pluckOuterSymbol(string memory attr)
     internal
     pure
     returns (string memory)
   {
-    uint rnd = (uint256(keccak256(abi.encodePacked("outer", tokenId, index))) % 13) + 1;
+    uint rnd = (uint256(keccak256(abi.encodePacked(attr))) % 13) + 1;
 
     return SymbolStoreOuter.getSymbol(rnd);
   }

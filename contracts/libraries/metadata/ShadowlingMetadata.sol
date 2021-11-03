@@ -103,7 +103,7 @@ contract ShadowlingMetadata is ERC721Enumerable {
         string[4] memory parts;
         parts[
             0
-        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500" width="500" height="500"><style>.base { fill: #AAA; font-family: "Gill Sans", sans-serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#000026" />';
+        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500" width="500" height="500"><style>.base { fill: #AAA; font-family: "Gill Sans", sans-serif; font-size: 11px; }</style><rect width="100%" height="100%" fill="#000026" />';
 
         Attributes.ItemStrings memory props = properties(tokenId);
         // string memory svg = string(
@@ -111,7 +111,7 @@ contract ShadowlingMetadata is ERC721Enumerable {
         // );
 
         parts[1] = Attributes.render(props);
-        parts[2] = Symbols.render(tokenId);
+        parts[2] = Symbols.render(props);
 
         string memory output = string(
             abi.encodePacked(parts[0], parts[1], parts[2])
