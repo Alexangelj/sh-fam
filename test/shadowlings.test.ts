@@ -59,14 +59,14 @@ describe("Shadowlings", function () {
       await altar.claim(tokenId, revealHash)
       let uri = await shdw.tokenURI(tokenId)
       let json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
     })
 
     it("should claim tokenId 1, print its props, then change it and re print", async function () {
       await altar.claim(tokenId, revealHash)
       let uri = await shdw.tokenURI(tokenId)
       let json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
       revealHash = formatBytes32String("yoga")
       const hashedKey = await altar.getHash(revealHash)
       await altar.commitKey(hashedKey)
@@ -74,7 +74,7 @@ describe("Shadowlings", function () {
       await altar.modify(tokenId, 2, revealHash)
       uri = await shdw.tokenURI(tokenId)
       json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
     })
   })
 
@@ -84,7 +84,7 @@ describe("Shadowlings", function () {
       await altar.claim(i, revealHash)
       let uri = await shdw.tokenURI(i)
       let json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
       revealHash = formatBytes32String("pog")
       const hashedKey = await altar.getHash(revealHash)
       await altar.commitKey(hashedKey)
@@ -92,7 +92,7 @@ describe("Shadowlings", function () {
       await altar.modify(i, 2, revealHash)
       uri = await shdw.tokenURI(i)
       json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
     })
 
     it("should remove all four traits then add them", async function () {
@@ -105,7 +105,7 @@ describe("Shadowlings", function () {
       await altar.modify(i, 6, revealHash)
       let uri = await shdw.tokenURI(i)
       let json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
       revealHash = formatBytes32String("yoda")
       const hashed = await altar.getHash(revealHash)
       await altar.commitKey(hashed)
@@ -113,7 +113,7 @@ describe("Shadowlings", function () {
       await altar.modify(i, 5, revealHash)
       uri = await shdw.tokenURI(i)
       json = parseTokenURI(uri)
-      log(json)
+      log(json.attributes)
     })
 
     it.only("should modify traits of 10", async function () {
@@ -143,7 +143,7 @@ describe("Shadowlings", function () {
         const image = parseImage(json)
         images.push(image)
         imageData[i] = json.image
-        log(json)
+        log(json.attributes)
       }
 
       await fs.promises.writeFile("./data.json", JSON.stringify(imageData))
@@ -166,7 +166,7 @@ describe("Shadowlings", function () {
         const image = parseImage(json)
         images.push(image)
         imageData[i] = json.image
-        log(json)
+        log(json.attributes)
       }
 
       await fs.promises.writeFile("./data.json", JSON.stringify(imageData))

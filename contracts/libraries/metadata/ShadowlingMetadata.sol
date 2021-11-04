@@ -55,10 +55,6 @@ contract ShadowlingMetadata is ERC721Enumerable {
         override(ERC721)
         returns (string memory)
     {
-        Attributes.ItemStrings memory props = properties(tokenId);
-        string memory svg = string(
-            abi.encodePacked(Attributes.render(props), Stats.render(tokenId))
-        );
         string memory json = Base64.encode(
             bytes(
                 string(
@@ -68,7 +64,7 @@ contract ShadowlingMetadata is ERC721Enumerable {
                         '", ',
                         '"description" : ',
                         '"Shadowlings follow you in your journey across chainspace, the shadowchain, and beyond...", ',
-                        render(svg),
+                        render(tokenId),
                         attributes(tokenId)
                     )
                 )
@@ -103,14 +99,19 @@ contract ShadowlingMetadata is ERC721Enumerable {
 
     // Symbol Rendering
 
-    function render(string memory attr) public view returns (string memory) {
+    function render(uint256 tokenId) public view returns (string memory) {
         string[4] memory parts;
         parts[
             0
-        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350" width="350" height="350"><style>.base { fill: white; font-family: serif; font-size: 14px; }</style><rect width="100%" height="100%" fill="#000026" />';
+        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500" width="500" height="500"><style>.base { fill: #AAA; font-family: "Gill Sans", sans-serif; font-size: 11px; }</style><rect width="100%" height="100%" fill="#000026" />';
 
-        parts[1] = attr;
-        parts[2] = renderSymbols();
+        Attributes.ItemStrings memory props = properties(tokenId);
+        // string memory svg = string(
+        //     abi.encodePacked(Attributes.render(props), Stats.render(tokenId))
+        // );
+
+        parts[1] = Attributes.render(props);
+        parts[2] = Symbols.render(props);
 
         string memory output = string(
             abi.encodePacked(parts[0], parts[1], parts[2])
@@ -126,46 +127,6 @@ contract ShadowlingMetadata is ERC721Enumerable {
             )
         );
 
-        return output;
-    }
-
-    function renderSymbols() internal view returns (string memory) {
-        string[11] memory parts;
-
-        parts[0] = '<g transform="scale(0.01) translate(5000, 17000)" >';
-        parts[1] = Symbols.OUTER1();
-        parts[2] = '</g><g transform="scale(0.01) translate(16000, 2000)" >';
-        parts[3] = Symbols.OUTER2();
-        parts[4] = '</g><g transform="scale(0.01) translate(27000, 17000)" >';
-        parts[5] = Symbols.OUTER3();
-        parts[6] = '</g><g transform="scale(0.01) translate(16000, 30000)" >';
-        parts[7] = Symbols.OUTER4();
-        parts[8] = '</g><g transform="scale(0.1) translate(500, 500)" >';
-        parts[9] = Symbols.CENTRAL1();
-        parts[10] = "</g>";
-
-        string memory output = string(
-            abi.encodePacked(
-                parts[0],
-                parts[1],
-                parts[2],
-                parts[3],
-                parts[4],
-                parts[5],
-                parts[6],
-                parts[7],
-                parts[8]
-            )
-        );
-        output = string(abi.encodePacked(output, parts[9], parts[10]));
-
-        /* parts[0] = '<g transform="scale(0.1) translate(150, 150)" >';
-        parts[9] = Symbols.CENTRAL1();
-        parts[10] = "</g>";
-
-        string memory output = string(
-            abi.encodePacked(parts[0], parts[9], parts[10])
-        ); */
         return output;
     }
 }

@@ -32,7 +32,7 @@ library Components {
     uint256 internal constant itemsLength = 48;
 
     string internal constant origins =
-        "Shadowkain's Domain,Kulechovs Dominion ,Perilous Farms,Dark Forest,Mempool,Shadowchain,Polygonal Meshspace,Lands of Arbitrum,Chainspace,Chains of Nazarov,Blue Lagoon,Swamp,Genesis Cube,Lands of Optimism,Ether Chain,Outerblocks";
+        "Shadowkain's Domain,Kulechovs Dominion,Perilous Farms,Dark Forest,Mempool,Shadowchain,Polygonal Meshspace,Lands of Arbitrum,Chainspace,Chains of Nazarov,Blue Lagoon,Swamp,Genesis Cube,Lands of Optimism,Ether Chain,Outerblocks";
     uint256 internal constant originsLength = 16;
 
     string internal constant bloodlines =
@@ -40,7 +40,7 @@ library Components {
     uint256 internal constant bloodlinesLength = 33;
 
     string internal constant perks =
-        "3'3,Shitposting,Diamond Bull Horns,Masternode,Front Running,MEV Collector,NFT Flipper,Artblocks Connoisseur ,Diamond Hands,Free Transactions,Made It ,Flash Bundler,Private Relays,Compounding,Galaxy Brain,Low IQ,High IQ,Rugged,Doxxed,Liquidated,Waifu Simp,Exploited,Paper Hands,Flash Loaned,UTXO,Theorist,NGMI,Mid IQ,Copy Trader,Larper,Floor seller,Goxxed,Oyster Forked,Chad Bro,Exit Liquidity,Hacked,Failed Transaction,Black Hat,White Hat,Zero Knowledge";
+        "3'3,Shitposting,Diamond Bull Horns,Masternode,Front Running,MEV Collector,NFT Flipper,Artblocks Connoisseur,Diamond Hands,Free Transactions,Made It,Flash Bundler,Private Relays,Compounding,Galaxy Brain,Low IQ,High IQ,Rugged,Doxxed,Liquidated,Waifu Simp,Exploited,Paper Hands,Flash Loaned,UTXO,Theorist,NGMI,Mid IQ,Copy Trader,Larper,Floor seller,Goxxed,Oyster Forked,Chad Bro,Exit Liquidity,Hacked,Failed Transaction,Black Hat,White Hat,Zero Knowledge";
     uint256 internal constant perksLength = 40;
 
     string internal constant names =

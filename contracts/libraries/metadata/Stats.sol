@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../Random.sol";
-import { Base64, toString, trait } from "../MetadataUtils.sol";
+import { Base64, toString, statTrait } from "../MetadataUtils.sol";
 
 /// @notice Inspired by Andy
 library Stats {
@@ -17,42 +17,42 @@ library Stats {
 
     /// @param tokenId Shadowling tokenId; stats are static to each tokenId
     /// @return SVG string that renders the stats as text
-    function render(uint256 tokenId) internal pure returns (string memory) {
-        string[13] memory stats;
+    // function render(uint256 tokenId) internal pure returns (string memory) {
+    //     string[13] memory stats;
 
-        stats[0] = '<text x="10" y="140" class="base">';
-        stats[1] = strStat(tokenId);
-        stats[2] = '</text><text x="10" y="160" class="base">';
-        stats[3] = dexStat(tokenId);
-        stats[4] = '</text><text x="10" y="180" class="base">';
-        stats[5] = conStat(tokenId);
-        stats[6] = '</text><text x="10" y="200" class="base">';
-        stats[7] = intStat(tokenId);
-        stats[8] = '</text><text x="10" y="220" class="base">';
-        stats[9] = wisStat(tokenId);
-        stats[10] = '</text><text x="10" y="240" class="base">';
-        stats[11] = chaStat(tokenId);
-        stats[12] = "</text>";
+    //     stats[0] = '<text x="10" y="140" class="base">';
+    //     stats[1] = strStat(tokenId);
+    //     stats[2] = '</text><text x="10" y="160" class="base">';
+    //     stats[3] = dexStat(tokenId);
+    //     stats[4] = '</text><text x="10" y="180" class="base">';
+    //     stats[5] = conStat(tokenId);
+    //     stats[6] = '</text><text x="10" y="200" class="base">';
+    //     stats[7] = intStat(tokenId);
+    //     stats[8] = '</text><text x="10" y="220" class="base">';
+    //     stats[9] = wisStat(tokenId);
+    //     stats[10] = '</text><text x="10" y="240" class="base">';
+    //     stats[11] = chaStat(tokenId);
+    //     stats[12] = "</text>";
 
-        string memory output = string(
-            abi.encodePacked(
-                stats[0],
-                stats[1],
-                stats[2],
-                stats[3],
-                stats[4],
-                stats[5],
-                stats[6],
-                stats[7],
-                stats[8]
-            )
-        );
+    //     string memory output = string(
+    //         abi.encodePacked(
+    //             stats[0],
+    //             stats[1],
+    //             stats[2],
+    //             stats[3],
+    //             stats[4],
+    //             stats[5],
+    //             stats[6],
+    //             stats[7],
+    //             stats[8]
+    //         )
+    //     );
 
-        output = string(
-            abi.encodePacked(output, stats[9], stats[10], stats[11], stats[12])
-        );
-        return output;
-    }
+    //     output = string(
+    //         abi.encodePacked(output, stats[9], stats[10], stats[11], stats[12])
+    //     );
+    //     return output;
+    // }
 
     // ===== Attributes =====
 
@@ -61,17 +61,17 @@ library Stats {
     function attributes(uint256 tokenId) internal pure returns (string memory) {
         string memory res = string(
             abi.encodePacked(
-                trait(STR, strStat(tokenId)),
+                statTrait(STR, strStat(tokenId)),
                 ", ",
-                trait(DEX, dexStat(tokenId)),
+                statTrait(DEX, dexStat(tokenId)),
                 ", ",
-                trait(CON, conStat(tokenId)),
+                statTrait(CON, conStat(tokenId)),
                 ", ",
-                trait(INT, intStat(tokenId)),
+                statTrait(INT, intStat(tokenId)),
                 ", ",
-                trait(WIS, wisStat(tokenId)),
+                statTrait(WIS, wisStat(tokenId)),
                 ", ",
-                trait(CHA, chaStat(tokenId))
+                statTrait(CHA, chaStat(tokenId))
             )
         );
 
