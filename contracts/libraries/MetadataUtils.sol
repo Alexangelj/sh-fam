@@ -21,6 +21,25 @@ function trait(string memory _traitType, string memory _value)
         );
 }
 
+function statTrait(string memory _traitType, string memory _value)
+    pure
+    returns (string memory)
+{
+    return
+        string(
+            abi.encodePacked(
+                "{",
+                '"display_type": "number",',
+                '"trait_type": "',
+                _traitType,
+                '", ',
+                '"value": ',
+                _value,
+                "}"
+            )
+        );
+}
+
 function toString(uint256 value) pure returns (string memory) {
     // Inspired by OraclizeAPI's implementation - MIT license
     // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol

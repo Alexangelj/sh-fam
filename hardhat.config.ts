@@ -30,15 +30,16 @@ export default {
   networks: {
     hardhat: {
       hardfork: "london",
+      allowUnlimitedContractSize: true,
     },
-    kovan: {
-      accounts: [DEPLOYER_KEY],
-      chainId: 42,
-      url: KOVAN_RPC,
-      maxFeePerGas: maxFeePerGas,
-      maxPriorityFeePerGas: maxPriorityFeePerGas,
-      type: "0x02",
-    },
+    // kovan: {
+    //   accounts: [DEPLOYER_KEY],
+    //   chainId: 42,
+    //   url: KOVAN_RPC,
+    //   maxFeePerGas: maxFeePerGas,
+    //   maxPriorityFeePerGas: maxPriorityFeePerGas,
+    //   type: "0x02",
+    // },
 
     rinkeby: {
       accounts: [DEPLOYER_KEY],
